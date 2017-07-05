@@ -1,0 +1,175 @@
+<{include file="header.html"}>
+<{style href="css/common.css"}>
+<{style href="css/pager.css"}>
+<h1>
+  <span class="action-span"><a href="<{spUrl app=desktop c=ctl_article a=add class='2' type=$type}>">添加<{$article_type_name}></a></span>
+  <span class="action-span1"><{$article_type_name}>列表</span>
+  <div style="clear:both"></div>
+</h1>
+
+<div class="form-div">
+  <form action="<{spUrl app=desktop c=ctl_article a=index}>/search/do/class/2" method="post" name="searchForm">
+  <input type="hidden" name="type" value="<{$type}>" />
+    <{img src="img/icon_search_g.gif" width="26" height="22" border="0" alt="SEARCH"}>
+	<{if $type == '1'}>
+		<!-- 分类 -->
+		<select name="cat_id" id="cat_id">
+		  <option value="">所有分类</option>
+		  <{$cat}>
+		</select>
+	<{/if}>
+    <{$article_type_name}>标题：<input type="text" name="title" size="30" value="<{$title}>" />
+    <input type="submit" value="搜索" class="button" />
+  </form>
+</div>
+
+<form action="<{spUrl app=desktop c=ctl_article a=operator}>" method="post" name="actionForm" id="actionForm">
+  <div class="list-div" id="listDiv">
+    <table cellpadding="3" cellspacing="1" class="gridtable">
+      <thead>
+        <tr>
+          <th class="tlt" width="50">
+            <input id="selectAll" type="checkbox" />
+            <a href="javascript:;" class="sort" sort_name="article_id" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">序号</a>
+          </th>
+          <th><a href="javascript:;" class="sort" sort_name="title" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>" ><{$article_type_name}>标题</a></th>
+		  <{if $type == '1'}>
+          <th><a href="javascript:;" class="sort" sort_name="cat_id" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>"><{$article_type_name}>分类</a></th>
+		  <{/if}>
+          <th><a href="javascript:;" class="sort" sort_name="disabled" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">是否显示</a></th>
+          <th><a href="javascript:;" class="sort" sort_name="createtime" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">添加日期</a></th>
+          <th><a href="javascript:;" class="sort" sort_name="a_order" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">排序</a></th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <{foreach from=$article_list key=keys item=article}>
+        <tr>
+          <td>
+		  <{if $article.article_id > 3}>
+		  <input type="checkbox" name="article_id[]" value="<{$article.article_id}>" /> 
+		  <{/if}>
+		  <{$article.article_id}></td>
+          <td class="first-cell"><span onclick="listTable.edit(this, 'edit_article_title', <{$article.article_id}>)"><{$article.title|escape:html}></span></td>
+		  <{if $type == '1'}>
+          <td align="center"><span onclick="listTable.edit(this, 'edit_article_cat_name', <{$article.article_id}>)"><{$article.cat_name}></span></td>
+		  <{/if}>
+          <td align="center"><span onclick="listTable.edit(this, 'edit_article_disabled', <{$article.article_id}>)"><{if $article.disabled}>否<{else}>是<{/if}></span></td>
+          <td align="center"><span onclick="listTable.edit(this, 'edit_article_createtime', <{$article.article_id}>)"><{$article.createtime|date_format:"%Y-%m-%d %H:%M:%S"}></span></td>
+          <td align="center"><span onclick="listTable.edit(this, 'edit_article_a_order', <{$article.article_id}>)"><{$article.a_order}></span></td>
+
+          <td align="center"><a title="查看" target="_blank" href="<{spUrl app=b2c c=ctl_article a=view id=$article.article_id}>"><{img width="16" border="0" height="16" src="img/icon_view.gif"}></a>
+            <a title="编辑" href="<{spUrl app=desktop c=ctl_article a=edit article_id=$article.article_id class='2' type=$type}>"><{img width="16" border="0" height="16" src="img/icon_edit.gif"}></a>
+			<{if $article.article_id > 3}>
+            <a title="回收站" class="recycle" article_id="<{$article.article_id}>" href="javascript:;"><{img width="16" border="0" height="16" src="img/icon_trash.gif"}></a>
+			<{/if}>
+			</td>
+        </tr>
+        <{foreachelse}>
+        <tr><td class="no-records" colspan="11">暂无<{$article_type_name}></td></tr>
+        <{/foreach}>
+      </tbody>
+    </table>
+    <!-- end article list -->
+
+    <!-- 分页 -->
+    <table id="page-table" cellspacing="0">
+      <tr>
+        <td align="right" nowrap="true">
+          <div id="turn-page">
+            <{pager pager=$pager myclass="yahoo2" c="ctl_article" a="index" offset="5"}>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <div>
+      <input type="hidden" name="act" value="batch" />
+      <select name="action" id="operator">
+        <option value="">请选择...</option>
+        <option value="1">删除</option>
+		<{if $type == '1'}>
+        <option value="8">转移到分类</option>
+		<{/if}>
+      </select>
+      <select name="target_cat" id="target_cat" style="display:none">
+        <{$cat}>
+      </select>
+      <input type="button" value="确定" id="btn_operator" name="btn_operator" class="button" disabled="disabled" />
+    </div>
+  </div>
+</form>
+
+<script>
+  selectAll('selectAll','input[name^=article_id]');
+  // 操作
+  $('operator').addEvent('change', function(e){
+    // 显示分类
+    if (this.get('value') == '8'){
+      $('target_cat').setStyle('display', '');
+      }else{
+      $('target_cat').setStyle('display', 'none');
+    }
+
+    if (this.get('value')) {
+      $('btn_operator').set('disabled', '');
+      }else{
+      $('btn_operator').set('disabled', 'disabled');
+    }
+  });
+
+  // 确定操作
+  var actionForm = $('actionForm');
+  $('btn_operator').addEvent('click', function(e){
+    var operator = $('operator').get('value');
+    if (operator == '1' && window.confirm('确定要删除吗?删除后不可恢复')) {
+      actionForm.submit();
+    }
+
+    if (operator == '8' && window.confirm('确定要转移分类吗?')) {
+      actionForm.submit();
+    }
+
+    if (operator != '1' && operator != '8') {
+      actionForm.submit();
+    }	
+  });
+
+  $$('.recycle').addEvent('click',function(e){
+    e.stop();
+    var article_id = this.get('article_id');
+    if (window.confirm('确定要删除吗?删除后不可恢复')) {
+      new Request({url:'<{spUrl app=desktop c=ctl_article a=del}>/article_id/'+article_id,  
+        onComplete:function(re){
+          var result = JSON.decode(re);
+          if (result.rsp == 'succ')
+          {
+            alert('删除成功');
+            self.window.location.reload();
+            }else{
+            alert(result.res);
+            return false;
+          }
+        }
+      }).send();
+    }
+    return false;
+  });
+
+  // 排序
+  $$('.sort').addEvent('click',function(e){
+    var url = '<{spUrl app=desktop c=ctl_article a=index}>';
+    self.window.location = url + '/sort_name/' + this.get('sort_name') + '/sort_type/' + this.get('sort_type');
+  });
+
+<{if $type == '1'}>
+  // 搜索
+  var cat_option = $('cat_id').getElements('option');
+  var cid = '<{$cat_id}>';
+  cat_option.each(function(el){
+    if (el.get('value') == cid){
+      el.set('selected', 'selected');
+    }
+  });
+<{/if}>
+</script>

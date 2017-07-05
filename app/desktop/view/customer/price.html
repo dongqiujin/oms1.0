@@ -1,0 +1,112 @@
+<div class="dialog-forms">
+    <form method="post" action="<{spUrl app=desktop c=ctl_customer a=setPrice isAjax=true}>" id="customer_form">
+        <input type="hidden" name="action" value="<{$action}>" />
+        <input type="hidden" name="cus_id" value="<{$cus_id}>" />
+
+            <table>
+            <thead>
+                <th>产品名称</th>
+                <th>产品尺寸</th>
+                <th>产品颜色</th>
+                <th>价格(多个价格，以逗号隔开)</th>
+                <th>
+                    <{img src="img/add.png" width="16" height="16" border="0" alt="添加" class="add"}>
+                </th>
+            </thead>
+            <tbody id="product_body"  >
+                <{foreach from=$price key=keys item=product name="p_list"}>
+                <tr>
+                    <td>
+                        <input type="hidden" name="product[price_id][]" value="<{$product.price_id}>" size="20" />
+                        <input type="text" name="product[product_name][]" value="<{$product.product_name}>" size="30" />
+                    </td>
+                    <td>
+                        <input type="text" name="product[product_size][]" value="<{$product.product_size}>" size="10" />
+                    </td>
+                    <td>
+                        <input type="text" name="product[product_color][]" value="<{$product.product_color}>" size="10" />
+                    </td>
+                    <td>
+                        <input type="text" name="product[price][]" value="<{$product.price}>" size="50" style="font-size:15px;color:blue;" /> 
+                    </td>
+                    <td>
+                        <{img src='img/del.png' width='16' height='16' border='0' alt='删除' class='del-input'}>
+                    </td>
+                </tr>
+                <{/foreach}>
+            </tbody>
+            </table>
+            <div style="text-align: center;">
+            <button type="submit">保存</button>　<button type="button" class="popup-btn-close">取消</button>
+            </div>
+
+    </form>
+</div>
+<script>
+    window.addEvent('domready',function(){
+
+        // 添加
+        var delImg = "<{img src='img/del.png' width='16' height='16' border='0' alt='删除' class='del-input'}>";
+        $$('.add').addEvent('click', function(e){
+            var input = '<td>';
+                input += '    <input type="text" name="product[product_name][]" value="" size="20" />';
+                input += '</td>';
+                input += '<td>';
+                input += '    <input type="text" name="product[product_size][]" value="" size="10" />';
+                input += '</td>';
+                input += '<td>';
+                input += '    <input type="text" name="product[product_color][]" value="" size="10" />';
+                input += '</td>';
+                input += '<td>';
+                input += '    <input type="text" name="product[price][]" value="" size="50"  style="font-size:15px;color:blue;" />';
+                input += '</td>';
+                input += '<td>';
+                input += delImg;
+                input += '</td>';
+
+            var price = new Element('tr', {html: input}).inject('product_body', 'after');
+
+            price.getElement('.del-input').addEvent('click', function(e){
+                this.getParent('tr').destroy();
+            });
+        });
+
+        $$('.del-input').addEvent('click', function(e){
+            this.getParent('tr').destroy();
+        });
+
+        // 保存
+        var f = $('customer_form');
+        var action = f.get('action');
+        f.addEvent('submit',function(e){
+            e.stop();
+            if(!validator(this)) return false;
+
+            var submit_btn = this.getElement('[type=submit]');
+            new Request({url:action,
+                onRequest:function(e){
+                    submit_btn.set('disabled', true);
+                },
+                onComplete:function(re){
+                    var result = JSON.decode(re);
+                    if (result.rsp == 'succ')
+                    {
+                        alert(result.msg);
+                        submit_btn.getParent('.popup-container').retrieve('instance').hide();
+//                        self.window.location.reload();
+                    }else{
+                        submit_btn.set('disabled', false);
+                        alert(result.msg);
+                        return false;
+                    }
+                }
+            }).send(f.toQueryString());
+        });
+
+        // 取消
+        $$('.popup-btn-close').addEvent('click', function(e){
+            this.getParent('.popup-container').retrieve('instance').hide();
+        });
+
+    });
+</script>

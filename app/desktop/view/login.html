@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>飞天包装</title>
+<{style href="css/login.css"}>
+</head>
+<body id="login">
+<form action="<{spUrl app=desktop c=passport a=login}>" id="loginForm" method="post" onsubmit="return check(this)">
+  <h3>飞天包装订单管理系统</h3>
+  <div class="login">
+    <label for="userName"><span>用户名：</span><input name="username" value="<{$username}>" type="text" class="text" id="userName" /></label>
+    <label for="passWord"><span>密　码：</span>
+    <input type="password" class="text" name="password" id="passWord" /></label>
+    <{if $msg}>
+    <label style="color:red;"><{$msg}></label>
+    <{/if}>
+    <label id="submit"><input name="" type="submit" class="bt" value="确定" /></label>
+  </div>
+</form>
+
+<script>
+document.getElementById('userName').focus();
+function chkrd(f) {
+    f = document.getElementsByName(f);
+    var ck = false;
+    for(var i = 0; i < f.length; i++) {
+        if(f[i].checked){
+            ck = true;
+            break;
+        }
+    }
+    return ck;
+}
+function check(f){
+    if(f.username.value == '') {
+        alert('请输入用户名！');
+        f.username.focus();
+        return false;
+    }
+    if(f.password.value == '') {
+        alert('请输入密码！');
+        f.password.focus();
+        return false;
+    }
+    return true;
+}
+</script>
+</body>
+</html>

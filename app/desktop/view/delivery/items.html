@@ -1,0 +1,73 @@
+<div class="list-div" id="listDiv">
+    <table cellpadding="3" cellspacing="1">
+        <thead>
+        <tr>
+            <th><a href="javascript:;" class="sort" sort_name="order_bn" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>" >订单号</a></th>
+            <th><a href="javascript:;" class="sort" sort_name="type" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">产品名称</a></th>
+            <th><a href="javascript:;">尺寸</a></th>
+            <th><a href="javascript:;">颜色</a></th>
+            <th><a href="javascript:;" class="sort" sort_name="num" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">原订数</a></th>
+            <th><a href="javascript:;" class="sort" sort_name="send_num" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">已发货</a></th>
+            <th><a href="javascript:;" class="sort" sort_name="price" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">单价</a></th>
+            <th><a href="javascript:;" class="sort" sort_name="amount" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">金额</a></th>
+            <th><a href="javascript:;">备注</a></th>
+            <th class="last">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <{foreach from=$items key=keys item=order}>
+        <tr id="item_<{$order.item_id}>">
+            <td align="center"><{$order.order_bn}></td>
+            <td align="center"><{$order.name}></td>
+            <td align="center"><{$order.size}></td>
+            <td align="center"><{$order.color}></td>
+            <td align="center"><{$order.num}></td>
+            <td align="center"><{$order.send_num}></td>
+            <td align="center"><{$order.price}></td>
+            <td align="center"><{if $order.num == $order.send_num}><{$order.amount}><{else}><{round($order.price * $order.send_num,4)}><{/if}></td>
+            <td align="center"><{$order.memo}></td>
+			<td align="center" class="last">
+                    <a title="回收站" class="recycle-item" item_id="<{$order.item_id}>" tid="<{$order.order_bn}>" href="javascript:;"><{img width="16" bdelivery="0" height="16" src="img/del.png"}></a>
+            </td>
+
+        </tr>
+        <{foreachelse}>
+        <tr><td class="no-records" colspan="13">没有明细</td></tr>
+        <{/foreach}>
+        </tbody>
+    </table>
+</div>
+<div style="text-align:center;">
+    <button type="button" class="popup-btn-close">关闭</button>
+</div>
+<script>
+
+	//删除
+	$$('.recycle-item').addEvent('click',function(e){
+        e.stop();
+        var item_id = this.get('item_id');
+		var tid = this.get('tid');
+        if (window.confirm('确定要删除发货明细:'+tid+'吗?删除后不可恢复')){
+            new Request({url:'<{spUrl app=desktop c=ctl_delivery a=delItem}>/item_id/'+item_id,
+                onComplete:function(re){
+                    var result = JSON.decode(re);
+                    if (result.rsp == 'succ') {
+						alert('删除成功');
+						$('item_'+result.item_id).hide();
+                    }
+                    else{
+                        alert(result.res);
+                        return false;
+                    }
+                }
+            }).send();
+        }
+        return false;
+    });
+
+    // 取消
+    $$('.popup-btn-close').addEvent('click', function(e){
+        this.getParent('.popup-container').retrieve('instance').hide();
+    });
+
+</script>

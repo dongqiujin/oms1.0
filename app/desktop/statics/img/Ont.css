@@ -1,0 +1,50 @@
+.cdsearchbut{font-size:12px;background-image:url("but_cnter.gif"/*tpa=http://127.0.0.1/www/images/but_cnter.gif*/);background-repeat:repeat-x;text-align:center;cursor:hand;cursor:pointer;padding:3px 0px 0 0px;}
+.cdsearchmag{cursor:hand;cursor:pointer;}
+a.cdDefaultScope,a.cdDefaultScope:visited,a.cdDefaultScope:hover{
+	color:#0560A6;
+	text-decoration:none;
+	font-family: "宋体";
+	font-size: 12px;
+}
+a.cdNotDefaultScope,a.cdNotDefaultScope:visited,a.cdNotDefaultScope:hover{
+	color:#666;
+	text-decoration:none;
+	font-family: "宋体";
+	font-size: 12px;
+}
+.cdsearchbut a,.cdsearchbut a:visited,.cdsearchbut a:hover{
+	color:#006699;
+	text-decoration:none;
+	font-family: "宋体";
+	font-size: 12px;
+	font-weight: bold;
+	line-height: 18px;
+}
+#cdsdrop{cursor:hand;cursor:pointer;}
+#cdnavcont{background-image:url("bg_navcon.gif"/*tpa=http://127.0.0.1/www/bg_navcon.gif*/);background-repeat:repeat-x;background-position:bottom;background-color:#CBE0FD;zoom:100%;}
+#cdnavspacer{height:4px;background-color:#edf4fc;overflow:hidden;}
+.cdsearchboxcont{width:100%;height:32px;text-align:left;}
+.cdsearchlabel{font-size:12px;font-weight:bold; color:#4372B0;}
+#cdsearchoutcdsdrop{background-color:#FAFAFA;width:150px;display:none;text-align:left; border:1px solid #7A7A7A;}
+.cdsearchtextout,.cdsearchtextover{padding:2px 0 2px 5px;cursor:hand;cursor:pointer;font-size:12em;}
+.cdsearchtextout{background-color:#FAFAFA;border:1px solid #FAFAFA;}
+.cdsearchtextover{background-color:#FFE292;border:1px solid #DD9946;}
+.cdsearchsep{height:2px;font-size:1px;border-top:1px solid #ccc;border-bottom:1px solid #fff;margin:0;overflow:hidden;}
+.cdribbontext{color:#4372B0;font-size:12em;}
+input.cdsearchbox{
+	background-color:#F7FBFF;
+	border-top:1px solid #84A5CE;
+	border-left:1px solid #84A5CE;
+	border-right:1px solid #C1D2E7;
+	border-bottom:1px solid #C1D2E7;
+	font-family:"宋体";
+	font-size:12px;
+	display:inline;
+	width:200px;
+	height: 21px;
+	line-height: 18px;
+	padding-top: 1px;
+	padding-right: 1px;
+	padding-bottom: 1px;
+	padding-left: 4px;
+}

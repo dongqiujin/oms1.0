@@ -1,0 +1,110 @@
+<{include file="header.html"}>
+<{script src="js/editor/kindeditor.js" app="base"}>
+
+<div id="member_consignee">
+  <form method="post" name="sendmailForm" id="sendmailForm" action="<{spUrl app=desktop c=ctl_member a=send}>">
+    <input type="hidden" name="member_id" value="<{$member.member_id}>" />
+    <input type="hidden" name="action" value="send" />
+    <table>
+      <tr>
+        <td>会员名:</td>
+        <td><{$member.name}></td>
+      </tr>
+      <tr>
+        <td>接受邮件地址:</td>
+        <td><input type="text" name="sendto" id="sendto" value="<{$member.email}>" size="30" /></td>
+      </tr>
+      <tr>
+        <td>邮件标题:</td>
+        <td><input type="text" name="conf_email_title" id="conf_email_title" value="<{$conf_email_title}>" size="50" /></td>
+      </tr>
+      <tr>
+        <td>邮件内容:</td>
+        <td><textarea id="content" name="conf_email_content" style="width:600px;height:350px;visibility:hidden;text-align:left;"><{$conf_email_content}></textarea>
+          <button type="button" id="save_email_tempate">保存模板</button>
+        </td>
+      </tr>
+    </table>
+    <button type="button" id="do_sendemail">发送</button>
+    <button type="button" class="back" onclick="javascript:history.go(-1);">返回</button>
+    <!-- <input type="button" class="popup-btn-close" value="关闭" /> -->
+  </div>
+</form>
+
+<script>
+  window.addEvent('domready',function(){
+    var f = $('sendmailForm');
+    var action = f.get('action');
+
+    // 发送邮件
+    $('do_sendemail').addEvent('click', function(e){
+
+      var title = $('conf_email_title').get('value');
+      var content = KE.html('content');
+      $('content').set('html', content);
+      var sendto = $('sendto').get('value');
+      if (!title || !content || !sendto)
+      {
+        alert('邮件地址、标题与内容不能为空');
+        return false;
+      }
+
+      new Request({url:action,  data:$('sendmailForm'), 
+        onRequest:function(e){
+          $('do_sendemail').set('disabled', true);
+        },
+        onComplete:function(re){
+          var result = JSON.decode(re);
+          if (result.rsp == 'succ')
+          {
+            alert('发送成功');
+            }else{
+            alert(result.msg);
+            return false;
+          }
+          $('do_sendemail').set('disabled', false);
+        }
+      }).post();
+    });
+
+    // 保存模板
+    $('save_email_tempate').addEvent('click', function(e){
+      var title = $('conf_email_title').get('value');
+      var content = KE.html('content');
+      $('content').set('html', content);
+
+      var url = '<{spUrl app=desktop c=ctl_member a=save_mail_template}>';
+      new Request({url:url,data:$('sendmailForm'),
+        onComplete:function(re){
+          var result = JSON.decode(re);
+          if (result.rsp == 'succ')
+          {
+            alert('保存成功');
+            }else{
+            alert(result.msg);
+          }
+        }
+      }).post();
+    });
+
+    // 关闭
+    $$('.popup-btn-close').addEvent('click', function(e){
+      close();
+    }); 
+
+    function close(){
+      $('do_sendemail').getParent('.popup-container').retrieve('instance').hide();
+    }
+
+  });
+
+  KE.show({
+    id : 'content',
+    resizeMode : 1,
+    allowUpload : false,
+    items : [
+    'fontname', 'fontsize', '|', 'textcolor', 'bgcolor', 'bold', 'italic', 'underline',
+    'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist',
+    'insertunorderedlist', '|', 'emoticons', 'image', 'link']
+  });
+</script>

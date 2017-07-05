@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding="utf-8" ?> 
+<desktop>
+  <menu id="orders" name="订单">
+     <submenu name="订单管理">
+         <item ctl='ctl_customer' act='index' display='true' default='true'>客户列表</item>
+         <item ctl='ctl_order' act='index' params="ship_status:waiting" display='true' default='true'>订单列表</item>
+         <item ctl='ctl_delivery' act='index' params="print_status:0" display='true' default='true'>发货单列表</item>
+         <item ctl='ctl_sys' act='backup' display='true' default='true'>数据库备份</item>
+     </submenu>
+  </menu>
+  <menu id="customer" name="客户">
+     <submenu name="客户管理">
+        <item ctl='ctl_customer' act='index' display='true'>客户列表</item>
+     </submenu>
+  </menu>
+</desktop>

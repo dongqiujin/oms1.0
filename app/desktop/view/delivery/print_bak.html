@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--<meta name=vs_targetSchema content="http://schemas.microsoft.com/intellisense/ie5">-->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>打印发货单</title>
+    <{script src="js/jquery-1.4.2.min.js"}>
+    <{script src="js/jquery.floatDiv.js"}>
+    <style media=print>
+        .Noprint{display:none;}
+        .PageNext{page-break-after: always;}
+    </style>
+    <style>
+        .NOPRINT {
+            font-family: "宋体"; 
+            font-size: 12pt;
+        }
+        li {list-style-type:none; line-height: 20px;}
+    </style>
+</head>
+<body style="background-color: gray;">
+
+<div class="Noprint" id="printControl" style="width:400px; margin-left:auto; margin-right:auto; margin-bottom:30px;">
+        <OBJECT  id=WebBrowser  classid=CLSID:8856F961-340A-11D0-A96B-00C04FD705A2  height=0  width=0>
+        </OBJECT>
+        <input  type="button"  value="打印" id="print" onclick="document.all.WebBrowser.ExecWB(6,1)">
+        <!--<input  type=button  value=直接打印  onclick=document.all.WebBrowser.ExecWB(6,6)>-->
+        <input  type="button"  value="页面设置"  onclick="document.all.WebBrowser.ExecWB(8,1)">
+        <input  type="button"  value="打印预览"  onclick="document.all.WebBrowser.ExecWB(7,1)">
+</div>
+
+<{foreach from=$printData key=keys item=order name=print}>
+<div class="tabp" style="width:21cm; height:12.5cm; font-size:14px; background-color: white; margin-left:auto;padding-left:-30px; padding-top:10px; margin-right:auto;" id="listDiv">
+    <div style="text-align: center; font-size: 25px; line-height: 30px; ">海宁市飞天包装有限公司</div>
+    <div style="text-align: center;  line-height: 10px;">联系人：胡先生 &nbsp;&nbsp;&nbsp;  手机:15968357090  &nbsp;&nbsp;&nbsp; 传真：0573 - 87276509</div>
+    <div style="text-align: center; font-size:20px;font-weight:bold; margin-top:5px;">发 货 单</div>
+    <div style="float: left;width:12cm; margin-top:-30px; height:80px;">
+        <ul>
+            <li>发货单号：<{$order.delivery_bn}></li>
+            <li>日期：<{$smarty.now|date_format:'%Y-%m-%d'}></li>
+            <li>致：<{$order.customer.cus_company}></li>
+        </ul>
+    </div>
+    <div style="margin-top:-25px;">
+        <ul>
+            <li>客户代号：<{$order.customer.cus_bn}></li>
+            <li>联系人：<{$order.customer.cus_contacts}>   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;手机：<{$order.customer.cus_mobile}></li>
+            <li>地点：<{$order.customer.cus_address}></li>
+        </ul>
+    </div>
+    <div style="margin-left:10px; width:20cm;margin-right:auto; margin-top:-120px; padding-top:5px;">
+        <table cellpadding="3" cellspacing="1" style="width:98%; border-collapse:collapse;border:none; margin-top:-10px;">
+            <thead>
+            <tr style="border-bottom:1px #000000 solid;border-top:1px #000000 solid; text-align: center;">
+                <th width="8%">订单号</th>
+                <th width="8%">纸质</th>
+                <th width="15%">下单尺寸</th>
+                <th width="10%">原订数</th>
+                <th width="10%">送货数</th>
+                <th width="10%">单价</th>
+                <th width="10%">金额</th>
+                <th width="29%">备  注</th>
+            </tr>
+            </thead>
+            <tbody>
+            <{foreach from=$order.items key=key item=product}>
+            <tr style="text-align: center;">
+                <td class="first-cell"><{$product.order_bn}></td>
+                <td ><{if $product.goods_type == 'goods'}><{$product.type_name}><{else}>配件<{/if}></td>
+                <td style="text-align: left;">
+				<{if $product.goods_type == 'goods'}>
+					<{$product.length}>*<{$product.width}>*<{$product.height}>
+				<{else}>
+					<{$product.name}>
+				<{/if}>
+				</td>
+                <td class="center"><{$product.num}></td>
+                <td class="center"><{$product.send_num}></td>
+                <td class="center"><{number_format($product.price,3)}></td>
+                <td class="center"><{if $product.num == $product.send_num}><{number_format($product.amount,3)}><{else}><{number_format(round($product.price * $product.send_num,3),3)}><{/if}></td>
+                <td align="center"><{$product.memo}></td>
+            </tr>
+            <{/foreach}>
+
+            <tr style="text-align: center;border-top:1px #000000 solid; ">
+                <td colspan="8" style="padding-left: 250px;">总数量：<{$order.total_nums}>，总金额：<{$order.total_money}></td>
+            </tr>
+
+            <tr height="<{$order.line_top}>px">
+                <td colspan="7">
+                </td>
+            </tr>
+
+            <tr style="border-top:1px #000000 solid; text-align: left;">
+                <td colspan="8">
+                    <table style="width:100%;">
+                        <tr>
+                            <td style="width:30%;">客户意见：满意<input type="checkbox" /> 一般<input type="checkbox" />
+                                差<input type="checkbox" /> 很差<input type="checkbox" /></td>
+                            <td style="width:15%;">打单：</td>
+                            <td style="width:35%;">兹收到上列货品！ 收货人签字：</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>司机：</td>
+                            <td></td>
+                        </tr>
+                        <tr style="padding-top:8px;">
+                            <td colspan="3">备注：1、货物送到后请验收，否则造成损失由客户自行负责。2、本单据既为双方购销合同，又为双方债权债务凭证，客户签字或盖章后生效。若有合同双方发生纠纷，由供货方司法机关裁决。</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<{if !$smarty.foreach.print.last}>
+<div class="NOPRINT" style="height:5px;" ></div>
+<!--分页-->
+<div class="PageNext"></div>
+<{/if}>
+
+<{/foreach}>
+
+</body>
+</html>
+<script>
+    $("#printControl").floatdiv("righttop");
+
+    //打印
+    $('#print').click(function(e){
+        $.get("<{spUrl app=desktop c=ctl_delivery a=doPrint}>", { delivery_id: "<{$deliveryIds}>"} );
+    });
+</script>

@@ -1,0 +1,314 @@
+<{include file="header.html"}>
+<style>
+   .link {color:gray;cursor:pointer; padding:0px}
+   .active {color:white;cursor:pointer; background-color:green; padding:4px}
+</style>
+<h1>
+  <div>
+      <form action="<{spUrl app=desktop c=ctl_order a=index}>/cus_id/<{$cus_id}>/search/do/<{if $ship_status}>ship_status/<{$ship_status}><{/if}>" method="post" name="searchForm">
+          <{img src="img/icon_search_g.gif" width="26" height="22" border="0" alt="SEARCH"}>
+          <select name="cus_id">
+              <option value="">全部客户</option>
+              <{foreach from=$customerList key=keys item=cus}>
+                <option value="<{$cus.cus_id}>" <{if $cus.cus_id == $cus_id}>selected="selected"<{/if}> ><{$cus.cus_name}></option>
+              <{/foreach}>
+          </select>
+          <!-- 关键字 -->
+          下单时间：<input type="text" name="from_create_time" id="from_create_time" size="10" value="<{$from_create_time}>" onFocus="WdatePicker()" /> -
+          <input type="text" name="to_create_time" id="to_create_time" size="10" value="<{$to_create_time}>" onFocus="WdatePicker()" />
+          发货时间：<input type="text" name="from_delivery_time" id="from_delivery_time" size="10" value="<{$from_delivery_time}>" onFocus="WdatePicker()" /> -
+          <input type="text" name="to_delivery_time" id="to_delivery_time" size="10" value="<{$to_delivery_time}>" onFocus="WdatePicker()" />
+          订单号：<input type="text" name="order_bn" size="10" value="<{$order_bn}>" />
+          产品名称：<input type="text" name="product_name" size="6" value="<{$product_name}>" />
+          尺寸：<input type="text" name="product_size" size="6" value="<{$product_size}>" />
+          颜色：<input type="text" name="product_color" size="6" value="<{$product_color}>" />
+          <input type="submit" value="搜索" class="button" />
+      </form>
+  </div>
+  
+  <div style="clear:both"></div>
+</h1>
+
+<div>
+    <{if $allCustomer != 'true'}><input type="button" value="发货" id="delivery" name="btn_operator" class="button" /><{/if}>
+    <span class="action-span1">
+      <{if $customer.cus_name}>客户：<{$customer.cus_name}><{/if}> 订单列表：
+      <a href="<{spUrl app=desktop c=ctl_order a=index}><{if $cus_id}>/cus_id/<{$cus_id}><{/if}>/ship_status/waiting"><span class="<{if $ship_status == 'waiting'}>active<{else}>link<{/if}>">待发货</span></a><span style="color:red;">(<{$counterWaiting}>)</span> &nbsp;&nbsp;&nbsp;
+      <a href="<{spUrl app=desktop c=ctl_order a=index}><{if $cus_id}>/cus_id/<{$cus_id}><{/if}>/ship_status/1"><span class="<{if $ship_status == '1'}>active<{else}>link<{/if}>">已发货</span></a><span style="color:red;">(<{$counterShiped}>)</span> &nbsp;&nbsp;&nbsp;
+      <a href="<{spUrl app=desktop c=ctl_order a=index}><{if $cus_id}>/cus_id/<{$cus_id}><{/if}>/ship_status/all"><span class="<{if $ship_status == 'all'}>active<{else}>link<{/if}>">全部</span></a><span style="color:red;">(<{$counterAll}>)</span>
+  </span>
+</div>
+
+<form action="<{spUrl app=desktop c=ctl_order a=operator}>" method="post" name="actionForm" id="actionForm">
+  <input type="hidden" name="selfUrl" id="selfUrl" value="<{$selfUrl}>" />
+  <div class="list-div" id="listDiv">
+    <table cellpadding="3" cellspacing="1">
+      <thead>
+        <tr style="text-align: center;">
+          <th>
+            <input id="selectAll" type="checkbox" />
+          </th>
+          <{if !$customer}><th>客户</th><{/if}>
+          <th><a href="javascript:;" class="sort" sort_name="order_bn" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>" >订单号</a></th>
+          <th><a href="javascript:;" class="sort" sort_name="name" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">产品名称</a></th>
+          <th><a href="javascript:;" class="sort" sort_name="size" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">尺寸</a></th>
+          <th><a href="javascript:;" class="sort" sort_name="color" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">颜色</a></th>
+          <th><a href="javascript:;" class="sort" sort_name="num" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">原订数</a></th>
+          <th><a href="javascript:;" class="sort" sort_name="send_num" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">已发货</a></th>
+		  <th><a href="javascript:;" class="sort" sort_name="price" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">单价</a></th>
+          <th><a href="javascript:;" class="sort" sort_name="amount" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">金额</a></th>
+          <th><a href="javascript:;" class="sort" sort_name="create_time" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">下单时间</a></th>
+          <th><a href="javascript:;">发货时间</a></th>
+            <th><a href="javascript:;" class="sort" sort_name="ship_status" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">发货状态</a></th>
+          <th><a href="javascript:;">备注</a></th>
+          <th class="last">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <{foreach from=$order_list key=keys item=order}>
+        <tr>
+          <td align="center">
+              <{if $order.ship_status == '1' || $allCustomer == 'true'}>-<{else}><input type="checkbox" name="order_id[]" value="<{$order.order_id}>" /><{/if}>
+          </td>
+          <{if !$customer}><td align="center"><{$order.cus_name}></td><{/if}>
+          <td align="center"><{$order.order_bn}></td>
+            <td align="center"><{$order.name}></td>
+            <td align="center"><{$order.size}></td>
+            <td align="center"><{$order.color}></td>
+            <td align="center"><{$order.num}></td>
+            <td align="center"><{$order.send_num}></td>
+            <td align="center"><{$order.price}></td>
+            <td align="center"><{$order.amount}></td>
+          <td align="center"><{$order.create_time|date_format:'%Y-%m-%d %H:%M:%S'}></td>
+          <td align="center"><{$order.delivery_time|date_format:'%Y-%m-%d %H:%M:%S'}></td>
+            <td align="center"><{$order.ship_status_name}></td>
+            <td align="center"><{$order.memo}></td>
+          <td align="center" class="last">
+            <a title="回收站" class="recycle" order_id="<{$order.order_id}>" href="javascript:;"><{img width="16" border="0" height="16" src="img/del.png"}></a>
+          </td>
+        </tr>
+        <{foreachelse}>
+        <tr><td class="no-records" colspan="13">没有订单</td></tr>
+        <{/foreach}>
+      </tbody>
+    </table>
+    <!-- end order list -->
+
+    <!-- 分页 -->
+    <table id="page-table" cellspacing="0">
+      <tr>
+        <td align="center" nowrap="true">
+          <div id="turn-page">
+            <{pager pager=$pager myclass="yahoo2" c="ctl_order" a="index" cus_id=$cus_id ship_status=$ship_status offset="1"}>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <div>
+      <input type="hidden" name="act" value="batch" />
+      <select name="action" id="operator">
+        <option value="">请选择...</option>
+        <option value="1">删除</option>
+      </select>
+      <input type="button" value="确定" id="btn_operator" name="btn_operator" class="button" disabled="disabled" />
+    </div>
+    </div>
+
+    <div style="margin-top:20px;">
+        <div style="float:left;margin-right:50px;font-size:14px;color:blue;">
+          <h1>产品、尺寸、颜色统计：</h1>
+          <ul>
+              <{foreach from=$total_products_all key=keys item=item}>
+                <li><{$item.name}><{$item.size}><{$item.color}>，原订数:<{$item.num}>， 已发货:<{$item.send_num}></li>
+              <{/foreach}>
+          </ul>
+        </div>
+
+        <div style="float:left;margin-right:50px;font-size:14px;color:blue;">
+          <h1>产品名称统计：</h1>
+          <ul>
+              <{foreach from=$total_products_name key=keys item=item}>
+                <li><{$item.name}>，原订数:<{$item.num}>，已发货:<{$item.send_num}></li>
+              <{/foreach}>
+          </ul>
+        </div>
+
+        <div style="float:left;margin-right:50px;font-size:14px;color:blue;">
+          <h1>产品尺寸统计：</h1>
+          <ul>
+              <{foreach from=$total_products_size key=keys item=item}>
+                <li><{$item.size}>，原订数:<{$item.num}>，已发货:<{$item.send_num}></li>
+              <{/foreach}>
+          </ul>
+        </div>
+
+        <div style="margin-right:50px;font-size:14px;color:blue;">
+          <h1>产品颜色统计：</h1>
+          <ul>
+              <{foreach from=$total_products_color key=keys item=item}>
+                <li><{$item.color}>，原订数:<{$item.num}>，已发货:<{$item.send_num}></li>
+              <{/foreach}>
+          </ul>
+        </div>
+
+  </div>
+</form>
+
+<script>
+	// 字段编辑
+	function editab(obj,order_id,field){
+		// 原始内容
+		var old_value = $(obj).get('text');
+		// 隐藏原值
+		$(obj).set('text', '');
+		// 创建输入框
+		var input = new Element('input', {'type':'text', 'name':field, 'size':'', 'value':old_value});
+		input.inject($(obj));
+		input.focus();
+		input.addEvents({
+			'blur': function(e){
+			    var new_value = this.get('value');
+				if (old_value == new_value)
+				{
+					$(obj).empty();
+					$(obj).set('text', new_value);
+				}else{
+					new Request({url:'<{spUrl app=desktop c=ctl_order a=editab}>',
+						onComplete:function(re){
+						  var result = JSON.decode(re);
+						  if (result.rsp == 'succ') {
+							 $(obj).empty();
+							 $(obj).set('text', new_value);
+						  }
+						  else{
+							alert(result.msg);
+							input.focus();
+							return false;
+						  }
+						}
+					  }).send('order_id='+order_id+'&'+field+'='+new_value+'&field_name='+field);
+				}
+			}
+		});
+	}
+
+	// 状态切换
+	function toggle(obj,order_id,field){
+		// 原始状态
+		var old_status = $(obj).get('src');
+		var old_value = $(obj).get('alt');
+		var new_value = '';
+		if (old_value == '0')
+		{
+			var new_src = '<{$base_url}>/app/desktop/statics/img/yes.gif';
+			var new_value = '1';
+		}else{
+			var new_src = '<{$base_url}>/app/desktop/statics/img/no.gif';
+			var new_value = '0';
+		}
+		
+		new Request({url:'<{spUrl app=desktop c=ctl_order a=editab}>',
+			onComplete:function(re){
+			  var result = JSON.decode(re);
+			  if (result.rsp == 'succ') {
+				 $(obj).set('src', new_src);
+				 $(obj).set('alt', new_value);
+			  }
+			  else{
+				alert(result.msg);
+				return false;
+			  }
+			}
+		  }).send('order_id='+order_id+'&'+field+'='+new_value+'&field_name='+field);
+	}
+
+    // 下单
+    $$('.order').addEvent('click', function(e){
+        var cus_id = this.get('cus_id');
+        var url = '<{spUrl app=desktop c=ctl_order a=add}>/cus_id/' + cus_id;
+        dialog('客户下单', url, '', 700, 450);
+    });
+
+    // 发货
+    $('delivery').addEvent('click', function(e){
+        var cus_id = '<{$cus_id}>';
+        var data = $('actionForm').toQueryString();
+        var url = '<{spUrl app=desktop c=ctl_order a=delivery}>/cus_id/' + cus_id;
+        dialog('发货', url, data, 700, 450);
+    });
+
+    function dialog(title,url,data,width,height){
+        width = width ? width : '680';
+        height = height ? height : '350';
+        new Dialog(url,{title:title, width:width,height:height,pins:true,async:'ajax',
+            position: {
+                offset: {x: 0, y: -60},
+                intoView: true
+            },
+            asyncOptions: {
+                method: 'post',
+                data: data
+            }
+        });
+    }
+  
+    // 全选与取消全选
+    $('selectAll').addEvent('click', function(e){
+        if (this.get('checked')) {
+            $$('input[name="order_id[]"').set('checked', 'checked');
+        } else {
+            $$('input[name="order_id[]"').set('checked', '');
+        }
+    });
+
+  // 操作
+  $('operator').addEvent('change', function(e){
+
+    if (this.get('value')) {
+      $('btn_operator').set('disabled', '');
+    }else{
+      $('btn_operator').set('disabled', 'disabled');
+    }
+  });
+
+  // 确定操作
+  var actionForm = $('actionForm');
+  $('btn_operator').addEvent('click', function(e){
+    var operator = $('operator').get('value');
+    if (operator == '1' && window.confirm('确定要删除吗?删除后不可恢复')){
+      actionForm.submit();
+    }
+
+    if (operator != '1') {
+      actionForm.submit();
+    }
+  });
+
+  $$('.recycle').addEvent('click',function(e){
+    e.stop();
+    var order_id = this.get('order_id');
+    if (window.confirm('确定要删除吗?删除后不可恢复')){
+      new Request({url:'<{spUrl app=desktop c=ctl_order a=del}>/order_id/'+order_id,
+        onComplete:function(re){
+          var result = JSON.decode(re);
+          if (result.rsp == 'succ') {
+            alert('删除成功');
+            self.window.location.reload();
+          }
+          else{
+            alert(result.res);
+            return false;
+          }
+        }
+      }).send();
+    }
+    return false;
+  });
+
+  // 排序
+  $$('.sort').addEvent('click',function(e){
+    var url = '<{$selfUrl}>';
+    self.window.location = url + '/sort_name/' + this.get('sort_name') + '/sort_type/' + this.get('sort_type');
+  });
+</script>

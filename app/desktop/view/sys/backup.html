@@ -1,0 +1,16 @@
+<{include file="header.html"}>
+<div><h3>数据库备份</h3></div>
+<form method="post" id="sys_form" action="<{spUrl app=desktop c=ctl_sys a=doBackup}>">
+    <div class="tab-pane" id="tabPane1">
+    </div>
+    <div style="text-align:center;">
+        <input type="button" id="backup" value="备份" />
+    </div>
+</form>
+<script>
+    $('backup').addEvent('click',function(e){
+        $('backup').set('value', '正在备份,请稍候...');
+        $('backup').set('disabled','disabled');
+        $('sys_form').submit();
+    });
+</script>

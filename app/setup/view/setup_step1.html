@@ -1,0 +1,89 @@
+<{include file="setup_header.html"}>
+
+<div id="checking">
+<form method="post">
+<table border="0" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+<tr>
+<td valign="top" >
+<div id="wrapper" style="padding:0px 0; margin-left:20px; overflow-y:auto; ">
+
+<div style="float:left; ">
+	<h3>环境检查</h3>
+	<table border="0"  class="tb">
+	<tbody>
+	<tr>
+		<th>项目</th>
+		<th >所需配置</th>
+		<th >当前服务器</th>
+	</tr>
+	<{foreach from=$system_check item=items}>
+	<tr>
+	<td><{$items.name}></td>
+	<td ><{$items.need_ver}></td>
+	<td >
+	<{img src="images/<{if $items.cur_ver>=$items.need_ver}>allow<{else}>deny<{/if}>.gif" border="0"}>
+	<{if $items.cur_ver}><{$items.cur_ver}><{/if}>
+	</td>
+	</tr>
+	<{/foreach}>
+	</tbody>
+	</table>
+</div>
+<div style="float:none; ">
+	<h3 class="title">函数依赖性检查</h3>
+	<table  class="tb">
+	<tbody><tr>
+		<th>函数名称</th>
+		<th >检查结果</th>
+		<th >建议</th>
+	</tr>
+	<{foreach from=$function_check item=items}>
+	<tr>
+	<td><{$items.name}></td>
+	<td ><{img src="images/<{$items.is_support}>.gif" border="0"}></td>
+	<td >
+	<{$items.advice}>
+	</td>
+	</tr>
+	<{/foreach}>
+	</tbody>
+	</table>
+</div>
+<br/>
+	<h3 class="title">目录、文件权限检查</h3>
+	<table  class="tb">
+		<tbody><tr>
+		<th>目录文件</th>
+		<th >所需状态</th>
+		<th >当前状态</th>
+	</tr>
+	<{foreach from=$dir_check item=items}>
+	<tr>
+	<td><{$items.name}></td>
+	<td ><{$items.need_status}></td>
+	<td >
+	<{img src="/images/<{$items.cur_status}>.gif" border="0"}>
+	</td>
+	</tr>
+	<{/foreach}>
+	</tbody>
+	</table>
+		
+</div>
+</td>
+
+<td width="227" valign="top" background="<{$themes_dir}>/images/install-step2-zh_cn.gif">&nbsp;</td>
+</tr>
+<tr>
+  <td><div id="install-btn"><input type="button"  id="js-pre-step" class="button" value="上一步：安装协议" onclick="javascript:window.location='<{spUrl app=setup c=setup a=index}>'" />
+      <input type="button" class="button" id="js-recheck" class="button" value="重新检查"  onclick="javascript:window.location='<{spUrl app=setup c=setup a=step1}>'"/>
+      <input type="button" class="button" id="js-submit"  class="button" value="下一步：配置系统"  <{$disabled}> onclick="javascript:window.location='<{spUrl app=setup c=setup a=step2}>'"/></div>
+  </td>
+  <td></td>
+</tr>
+</table>
+</form>
+</div>
+
+<{include file="setup_footer.html"}>
+

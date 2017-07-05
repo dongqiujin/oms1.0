@@ -1,0 +1,63 @@
+<div class="dialog-forms">
+    <form method="post" action="<{spUrl app=desktop c=ctl_cat a=save}>" id="cat_form">
+        <input type="hidden" name="action" value="<{$action}>" />
+        <input type="hidden" name="cat_id" value="<{$cat_detail.cat_id}>" />
+        <input type="hidden" name="class_id" value="<{$class_id}>" />
+        <ul class="cat-edit">
+            <li>分类名称：<input type="text" name="cat_name" value="<{$cat_detail.cat_name}>" /></li>
+            <li>是否显示：<input type="radio" name="disabled" value="0" <{if $cat_detail.disabled != '1'}>checked="checked"<{/if}> />是 <input type="radio" name="disabled" value="1" <{if $cat_detail.disabled == '1'}>checked="checked"<{/if}> />否 </li>
+            <li>上级分类：<select id="pid" name="pid">
+              <option value="0">--无--</option>
+              <{$cat}>
+            </select>顶级分类请选择无
+            </li>
+            <li>排　　序：<input type="text" name="cat_order" size="2" value="<{$cat_detail.cat_order}>" /></li>
+        </ul>
+        <button type="submit">保存</button>　<button type="button" class="popup-btn-close">取消</button>
+    </form>
+</div>
+<script>
+window.addEvent('domready',function(){
+
+    // 选中父类
+    var s = $('pid').getElements('option');
+    var cid = '<{$cid}>';
+    s.each(function(el){
+        if (el.get('value') == cid){
+            el.set('selected', 'selected');
+        }
+    });
+
+    // 保存
+    var f = $('cat_form');
+    var action = f.get('action');
+    f.addEvent('submit',function(e){
+        e.stop();
+        //if(!validator(this)) return false;
+
+        var submit_btn = this.getElement('[type=submit]');
+        new Request({url:action,  
+        onRequest:function(e){
+            submit_btn.set('disabled', true);
+        },
+        onComplete:function(re){
+            var result = JSON.decode(re);
+            if (result.rsp == 'succ')
+            {
+                self.window.location.reload();
+            }else{
+                submit_btn.set('disabled', false);
+                alert(result.msg);
+                return false;
+            }
+        }
+        }).send(f.toQueryString());
+    });
+
+    // 取消
+    $$('.popup-btn-close').addEvent('click', function(e){
+        this.getParent('.popup-container').retrieve('instance').hide();
+    }); 
+
+});
+</script>

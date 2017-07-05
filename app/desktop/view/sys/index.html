@@ -1,0 +1,92 @@
+<{include file="header.html"}>
+<{style href="css/tab.css"}>
+<{script src="js/tab.js"}>
+<div><h3>系统配置</h3></div>
+<form method="post" id="sys_form" enctype="multipart/form-data" action="<{spUrl app=desktop c=ctl_sys a=save}>">
+  <div class="tab-pane" id="tabPane1">
+    <{foreach from=$sys_config key=keys item=sys}>
+    <div class="tab-page" id="tabPage<{$smarty.foreach.sys_config.iteration}>">
+      <h2 class="tab"><{$sys.label}></h2>
+      <table class="gridtable" cellpadding="5" cellspacing="2">
+        <{foreach from=$sys.items key=item_keys item=items}>
+        <tr>
+        <{if !isset($items.type) || in_array($items.type,array('text','password'))}>
+        <td width="120"><{$items.label}>：</td>
+        <td><input class="text" type="<{$items.type}>" name="<{$keys}>_<{$item_keys}>" value="<{$items.default}>" size="<{if $items.size}><{$items.size}><{else}>80<{/if}>" /></td>
+        <{elseif $items.type == 'textarea'}>
+        <td><{$items.label}>：</td>
+        <td><textarea name="<{$keys}>_<{$item_keys}>" editor="<{if $items.editor}>true<{/if}>" id="<{$items.editor}>" style="width:<{$items.width}>;height:<{$items.height}>;"><{$items.default}></textarea></td>
+        <{elseif $items.type == 'file'}>
+        <td><{$items.label}></td>
+        <td><input class="text" type="file" name="<{$keys}>_<{$item_keys}>" size="<{if $items.size}><{$items.size}><{else}>80<{/if}>" /></td>
+        <{elseif $items.type == 'button'}>
+        <td><{$items.label}></td>
+        <td><input type="text" name="<{$items.name}>" id="<{$items.name}>" value="<{$items.default}>" size="<{if $items.size}><{$items.size}><{else}>80<{/if}>" />
+        <input type="button" value="<{$items.button.label}>" onclick="javascript:operator('<{$items.button.operator}>','<{$items.name}>','<{$items.label}>');" /></td>
+        <{elseif in_array($items.type,array('radio','checkbox'))}>
+        <td><{$items.label}>：</td>
+        <td>
+        <{foreach from=$items.value item=detail}>
+        <input type="<{$items.type}>" name="<{$keys}>_<{$item_keys}><{if $items.type =='checkbox'}>[]<{/if}>" value="<{$detail.value}>" <{if $items.default == $detail.value || in_array($detail.value,$items.default)}>checked="checked"<{/if}> />
+        <{$detail.label}>
+        <{/foreach}>
+        </td>
+        <{elseif $items.type == 'select'}>
+        <td><{$items.label}>：</td>
+        <td>
+        <select name="<{$keys}>_<{$item_keys}>">
+          <{foreach from=$items.value item=detail}>
+          <option value="<{$detail.value}>" <{if $items.default == $detail.value}>selected="selected"<{/if}> />
+          <{$detail.label}>
+          </option>
+          <{/foreach}>
+        </select>
+        <{/if}>
+        </td>
+        <{if $items.description}><td><{$items.description}></td><{/if}>
+        </tr>
+        <{/foreach}>
+      </table>
+    </div>
+    <{/foreach}>
+  </div>
+  <div style="text-align:center;">
+    <button type="submit">保存</button>
+  </div>
+</form>
+<{script src="js/editor/kindeditor.js" app="base"}>
+<script>
+  var editors = $$('textarea[editor=true]');
+  editors.each(function(el){
+    KE.show({
+      id: el.get('id'),
+      newlineTag : 'br',
+      afterCreate : function(id) {
+        KE.event.ctrl(document, 13, function() {
+          KE.sync(id);
+          document.forms['sys_form'].submit();
+        });
+        KE.event.ctrl(KE.g[id].iframeDoc, 13, function() {
+          KE.sync(id);
+          document.forms['sys_form'].submit();
+        });
+      }
+    });
+  });
+
+  // 操作
+  function operator(action,id,label){
+    var value = $(id).get('value');
+    if (!value)
+    {
+      alert(label+'不能为空');
+      return false;
+    }
+    new Request({url:'<{spUrl app=desktop c=ctl_sys a=operator}>',
+      onComplete:function(re){
+        var result = JSON.decode(re);
+        alert(result.msg);
+      }
+    }).send('action='+action+'&value='+value);
+  }
+</script>

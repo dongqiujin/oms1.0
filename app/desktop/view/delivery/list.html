@@ -1,0 +1,173 @@
+<{include file="header.html"}>
+<style>
+    .link {color:gray;cursor:pointer; padding:0px}
+    .active {color:white;cursor:pointer; background-color:green; padding:4px}
+</style>
+<h1>
+  <span class="action-span">
+      <form action="<{$selfUrl}>/search/do/<{if $print_status != ''}>print_status/<{$print_status}><{/if}>" method="post" name="searchForm">
+          <{img src="img/icon_search_g.gif" width="26" height="22" bdelivery="0" alt="SEARCH"}>
+          <select name="cus_id">
+              <option value="">全部客户</option>
+              <{foreach from=$customerList key=keys item=cus}>
+              <option value="<{$cus.cus_id}>" <{if $cus.cus_id == $cus_id}>selected="selected"<{/if}> ><{$cus.cus_name}></option>
+              <{/foreach}>
+          </select>
+          <!-- 关键字 -->
+          发货时间：从<input type="text" name="from_print_time" id="from_print_time" size="8" value="<{$from_print_time}>" onFocus="WdatePicker()" /> 至
+          <input type="text" name="to_print_time" id="to_print_time" size="8" value="<{$to_print_time}>" onFocus="WdatePicker()" />
+          发货单号：<input type="text" name="delivery_bn" size="9" value="<{$delivery_bn}>" />
+          订单号：<input type="text" name="order_bn" size="4" value="<{$order_bn}>" />
+          <input type="submit" value="搜索" class="button" />
+      </form>
+  </span>
+  <span class="action-span1">
+      <{if $customer.cus_name}>客户：<{$customer.cus_name}><{/if}>  
+      <a href="<{$selfUrl}>/print_status/0"><span class="<{if $print_status == '0'}>active<{else}>link<{/if}>">未发货</span></a><span style="color:red;">(<{$counterUnPrint}>)</span> &nbsp;&nbsp;&nbsp;
+      <a href="<{$selfUrl}>/print_status/1"><span class="<{if $print_status == '1'}>active<{else}>link<{/if}>">已发货</span></a><span style="color:red;">(<{$counterPrinted}>)</span> &nbsp;&nbsp;&nbsp;
+      <a href="<{spUrl app=desktop c=ctl_delivery a=index}>/cus_id/<{$cus_id}>"><span class="<{if $print_status == ''}>active<{else}>link<{/if}>">全部</span></a><span style="color:red;">(<{$counterAll}>)</span>
+  </span>
+    <div style="clear:both"></div>
+</h1>
+
+<div>
+    <{if $allCustomer != 'true'}><input type="button" value="发货" id="delivery" name="btn_operator" class="button" /><{/if}>
+    <input type="button" value="清单" id="inventory" name="btn_operator" class="button" />
+</div>
+
+<form action="<{spUrl app=desktop c=ctl_delivery a=prints}>/cus_id/<{$cus_id}>" method="post" name="deliveryListForm" id="deliveryListForm" target="_blank">
+    <div class="list-div" id="listDiv">
+        <table cellpadding="3" cellspacing="1">
+            <thead>
+            <tr>
+                <th class="tlt" width="50">
+                    <input id="selectAll" type="checkbox" />
+                </th>
+                <{if !$customer}><th>客户</th><{/if}>
+                <th><a href="javascript:;" class="sort" sort_name="delivery_bn" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>" >发货单号</a></th>
+               <th>订单数量</th>
+				<th><a href="javascript:;" class="sort" sort_name="delivery_time" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">生成时间</a></th>
+                <th><a href="javascript:;" class="sort" sort_name="print_time" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">发货时间</a></th>
+                <th><a href="javascript:;" class="sort" sort_name="print_status" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">发货状态</a></th>
+                <th class="last">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <{foreach from=$list key=keys item=delivery}>
+            <tr>
+                <td align="center">
+                    <{if $allCustomer == 'true'}>-<{else}><input type="checkbox" name="delivery_id[]" value="<{$delivery.delivery_id}>" /><{/if}>
+                </td>
+                <{if !$customer}><td><{$delivery.cus_name}></td><{/if}>
+                <td align="center"><{$delivery.delivery_bn}></td>
+				<td align="center"><{$delivery.orderNums}></td>
+                <td align="center"><{$delivery.delivery_time|date_format:'%Y-%m-%d %H:%M:%S'}></td>
+                <td align="center"><{$delivery.print_time|date_format:'%Y-%m-%d %H:%M:%S'|default:'-'}></td>
+                <td align="center"><{$delivery.print_status_name|default:'-'}></td>
+                <td align="center" class="last">
+                    <a title="发货明细" href="javascript:;"><{img width="16" border="0" height="16" src="img/icon_view.gif" class="items" delivery_id=$delivery.delivery_id}></a>
+                    <span style="width:50px;">&nbsp;</span>
+                    <a title="回收站" class="recycle" delivery_id="<{$delivery.delivery_id}>" href="javascript:;"><{img width="16" bdelivery="0" height="16" src="img/del.png"}></a>
+                </td>
+            </tr>
+            <{foreachelse}>
+            <tr><td class="no-records" colspan="6">没有发货单</td></tr>
+            <{/foreach}>
+            </tbody>
+        </table>
+        <!-- end delivery list -->
+
+        <!-- 分页 -->
+        <table id="page-table" cellspacing="0">
+            <tr>
+                <td align="center" nowrap="true">
+                    <div id="turn-page">
+                        <{pager pager=$pager myclass="yahoo2" c="ctl_delivery" a="index" cus_id=$cus_id print_status=$print_status offset="2"}>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</form>
+
+<script>
+
+    // 发货
+    $('delivery').addEvent('click', function(e){
+        if (!$$('input[name="delivery_id[]"]').get('checked')) {
+            alert('请选择需要发货的发货单');
+            return;
+        }
+		
+        var cus_id = '<{$cus_id}>';//alert(cus_id);
+        $('deliveryListForm').set('action', '<{spUrl app=desktop c=ctl_delivery a=prints}>/cus_id/' + cus_id);
+		//alert('<{spUrl app=desktop c=ctl_delivery a=prints}>/cus_id/' + cus_id);
+		//console.log(2);
+        $('deliveryListForm').submit();
+    });
+
+    // 发货清单
+    $('inventory').addEvent('click', function(e){
+        var cus_id = '<{$cus_id}>';
+        $('deliveryListForm').set('action', '<{spUrl app=desktop c=ctl_delivery a=printInventory}>/cus_id/' + cus_id);
+        $('deliveryListForm').submit();
+    });
+
+    // 查看明细
+    $$('.items').addEvent('click', function(e){
+        var url = '<{spUrl app=desktop c=ctl_delivery a=items}>';
+        var delivery_id = this.get('delivery_id');
+        dialog('发货单明细', url, 'delivery_id='+delivery_id);
+    });
+
+    function dialog(title,url,data,width,height){
+        width = width ? width : '680';
+        height = height ? height : '350';
+        new Dialog(url,{title:title, width:width,height:height,pins:true,async:'ajax',
+            position: {
+                offset: {x: 0, y: -60},
+                intoView: true
+            },
+            asyncOptions: {
+                method: 'post',
+                data: data
+            }
+        });
+    }
+
+    // 全选与取消全选
+    $('selectAll').addEvent('click', function(e){
+        if (this.get('checked')) {
+            $$('input[name="delivery_id[]"').set('checked', 'checked');
+        } else {
+            $$('input[name="delivery_id[]"').set('checked', '');
+        }
+    });
+
+    $$('.recycle').addEvent('click',function(e){
+        e.stop();
+        var delivery_id = this.get('delivery_id');
+        if (window.confirm('确定要删除吗?删除后不可恢复')){
+            new Request({url:'<{spUrl app=desktop c=ctl_delivery a=del}>/delivery_id/'+delivery_id,
+                onComplete:function(re){
+                    var result = JSON.decode(re);
+                    if (result.rsp == 'succ') {
+                        alert('删除成功');
+                        self.window.location.reload();
+                    }
+                    else{
+                        alert(result.res);
+                        return false;
+                    }
+                }
+            }).send();
+        }
+        return false;
+    });
+
+    // 排序
+    $$('.sort').addEvent('click',function(e){
+        var url = '<{$selfUrl}>';
+        self.window.location = url + '/sort_name/' + this.get('sort_name') + '/sort_type/' + this.get('sort_type');
+    });
+</script>

@@ -1,0 +1,73 @@
+<{include file="header.html"}>
+<{script src="js/editor/kindeditor.js" app="base"}>
+<div><h3>添加/编辑模块</h3></div>
+<form method="post" id="moduleForm" name="moduleForm" action="<{spUrl app=desktop c=ctl_module a=save}>">
+  <input type="hidden" name="action" value="<{$action}>" />
+  <input type="hidden" name="module_id" value="<{$module_id}>" />
+  <div class="tab-page">
+    <table border="0" cellpadding="0" cellspacing="6" class="gridtable">
+      <tr>
+        <td width="70">模块标识:</td>
+        <td><input type="text" name="mark_type" value="<{$module.mark_type}>" size="80" /> <em class="red">*</em></td>
+      </tr>
+	  <tr>
+        <td width="70">模块名称:</td>
+        <td><input type="text" name="mark_title" value="<{$module.mark_title}>" size="80" /> <em class="red">*</em></td>
+      </tr>
+      <tr>
+        <td>模块内容:</td>
+        <td><textarea id="contents" name="contents" style="width:95%;height:380px;visibility:hidden;text-align:left;"><{$module.contents}></textarea></td>
+      </tr>
+    </table>
+  </div>
+  <div style="text-align:center;">
+    <button type="submit" id="save">保存</button>
+  </div>
+</form>
+<script>
+  // 保存
+  var f = $('moduleForm');
+  f.addEvent('submit',function(e){
+    //if(!validator(this)) return false;
+
+    var submit_btn = this.getElement('[type=submit]');
+    var mark_type = this.getElement('[name=mark_type]').get('value');
+    if (!mark_type)
+    {
+      alert('请填写模块标题');
+      return false;
+    }
+    var module_id = this.getElement('[name=module_id]').get('value');
+    new Request({url:'<{spUrl app=desktop c=ctl_module a=check_module_name}>',  
+      onRequest:function(e){
+        submit_btn.set('disabled', true);
+      },
+      onComplete:function(re){
+        var result = JSON.decode(re);
+        if (result.rsp == 'fail'){
+          submit_btn.set('disabled', false);
+          alert(result.msg);
+          return false;
+        }
+      }
+    }).send('mark_type='+mark_type+'&module_id='+module_id);
+
+    // 提交表单
+    f.submit();
+  });
+
+  KE.show({
+    id: 'contents',
+    newlineTag : 'br',
+    afterCreate : function(id) {
+      KE.event.ctrl(document, 13, function() {
+        KE.sync(id);
+        document.forms['moduleForm'].submit();
+      });
+      KE.event.ctrl(KE.g[id].iframeDoc, 13, function() {
+        KE.sync(id);
+        document.forms['moduleForm'].submit();
+      });
+    }
+  });
+</script>

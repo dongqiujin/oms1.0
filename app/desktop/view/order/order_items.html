@@ -1,0 +1,35 @@
+  <div class="list-div" id="listDiv">
+    <table cellpadding="3" cellspacing="1">
+      <thead>
+        <tr>
+          <th class="tlt" width="50">商品名称</th>
+          <th class="tlt" width="50">商品编号</th>
+          <th class="tlt" width="50">成本价</th>
+          <th class="tlt" width="50">销售价</th>
+          <th class="tlt" width="50">数量</th>
+          <th class="tlt" width="50">小计</th>
+        </tr>
+      </thead>
+      <tbody>
+        <{foreach from=$order_items key=keys item=items}>
+        <tr>
+          <td ><{$items.name}></td>
+          <td ><{$items.bn}></td>
+          <td ><{$items.cost_price}></td>
+          <td ><{$items.sales_price}></td>
+          <td ><{$items.num}></td>
+          <td ><{$items.num*$items.sales_price}></td>
+        <{/foreach}>
+      </tbody>
+    </table>
+
+    <div>
+    <button type="button" class="popup-btn-close">关闭</button>
+    </div>
+</div>
+<script>
+// 关闭
+$$('.popup-btn-close').addEvent('click', function(e){
+  this.getParent('.popup-container').retrieve('instance').hide();
+});
+</script>

@@ -1,0 +1,101 @@
+<{include file="header.html"}>
+<{script src="js/editor/kindeditor.js" app="base"}>
+<div><h3>添加/编辑<{$article_type_name}></h3></div>
+<form method="post" id="articleForm" name="articleForm" action="<{spUrl app=desktop c=ctl_article a=save}>">
+  <input type="hidden" name="action" value="<{$action}>" />
+  <input type="hidden" name="article_id" value="<{$article_id}>" />
+  <input type="hidden" name="type" value="<{$type}>" />
+  <div class="tab-page">
+    <table border="0" cellpadding="0" cellspacing="6" class="gridtable">
+      <tr>
+        <td width="70">标题:</td>
+        <td><input type="text" name="title" value="<{$article.title}>" size="80" /> <em class="red">*</em></td>
+      </tr>
+	  <{if $type == '1'}>
+      <tr>
+        <td>排序:</td>
+        <td><input type="text" name="a_order" value="<{$article.a_order}>" size="2" /></td>
+      </tr>
+      <tr>
+        <td>人气:</td>
+        <td><input type="text" name="visit" value="<{$article.visit}>" size="2" /> </td>
+      </tr>
+      <tr>
+        <td>分类:</td>
+        <td>
+          <select id="cat_id" name="cat_id">
+            <option value="0">--请选择--</option>
+            <{$cat}>
+          </select>
+        </td>
+      </tr>
+	  <{/if}>
+      <tr>
+        <td>内容</td>
+        <td><textarea id="contents" name="contents" style="width:95%;height:380px;visibility:hidden;text-align:left;"><{$article.contents}></textarea></td>
+      </tr>
+    </table>
+  </div>
+  <div style="text-align:center;">
+    <button type="submit" id="save">保存</button>
+  </div>
+</form>
+<script>
+  // 保存
+  var f = $('articleForm');
+  f.addEvent('submit',function(e){
+    //if(!validator(this)) return false;
+
+    var submit_btn = this.getElement('[type=submit]');
+    var title = this.getElement('[name=title]').get('value');
+    if (!title)
+    {
+      alert('请填写<{$article_type_name}>标题');
+      return false;
+    }
+    var article_id = this.getElement('[name=article_id]').get('value');
+    new Request({url:'<{spUrl app=desktop c=ctl_article a=check_article_name}>',  
+      onRequest:function(e){
+        submit_btn.set('disabled', true);
+      },
+      onComplete:function(re){
+        var result = JSON.decode(re);
+        if (result.rsp == 'fail'){
+          submit_btn.set('disabled', false);
+          alert(result.msg);
+          return false;
+        }
+      }
+    }).send('title='+title+'&article_id='+article_id);
+
+    // 提交表单
+    f.submit();
+  });
+
+  KE.show({
+    id: 'contents',
+    newlineTag : 'br',
+    afterCreate : function(id) {
+      KE.event.ctrl(document, 13, function() {
+        KE.sync(id);
+        document.forms['articleForm'].submit();
+      });
+      KE.event.ctrl(KE.g[id].iframeDoc, 13, function() {
+        KE.sync(id);
+        document.forms['articleForm'].submit();
+      });
+    }
+  });
+
+  // ------------------<{$article_type_name}>编辑
+  // 选择<{$article_type_name}>分类
+  <{if $type == '1'}>
+	  var cat_option = $('cat_id').getElements('option');
+	  var cid = '<{$article.cat_id}>';
+	  cat_option.each(function(el){
+		if (el.get('value') == cid){
+		  el.set('selected', 'selected');
+		}
+	  });
+  <{/if}>
+</script>

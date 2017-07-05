@@ -1,0 +1,111 @@
+<{include file="header.html"}>
+<h1>
+    <span class="action-span">电话：<{$customer.cus_tel}>  / <{$customer.cus_mobile}></span>
+    <span class="action-span1">客户：<{$customer.cus_name}>  &nbsp;&nbsp;&nbsp;&nbsp;日期：<{$smarty.now|date_format:'%Y-%m-%d'}></span>
+    <div style="clear:both"></div>
+</h1>
+
+<form action="<{spUrl app=desktop c=ctl_order a=makeDelivery}>" method="post" name="deliveryForm" id="deliveryForm">
+    <input type="hidden" name="cus_id" value="<{$cus_id}>" />
+    <div class="list-div" id="listDiv">
+        <table cellpadding="3" cellspacing="1">
+            <thead>
+            <tr>
+                <th><a href="javascript:;" >订单号</a></th>
+                <th><a href="javascript:;" >产品名称</a></th>
+                <th><a href="javascript:;">尺寸</a></th>
+                <th><a href="javascript:;">颜色</a></th>
+                <th><a href="javascript:;" >原订数</a></th>
+                <th><a href="javascript:;" >已发数</a></th>
+                <th><a href="javascript:;" >剩余数</a></th>
+            </tr>
+            </thead>
+            <tbody>
+            <{foreach from=$order_list key=keys item=order}>
+            <tr id="pr_<{$order.order_id}>">
+                <td align="center"><{$order.order_bn}></td>
+                <td align="center"><{$order.name}></td>
+                <td align="center"><{$order.size}></td>
+                <td align="center"><{$order.color}></td>
+                <td align="center"><{$order.num}></td>
+                <td align="center"><{$order.send_num}></td>
+                <td align="center">
+                    <{assign var="remain_num" value="<{$order.num-$order.send_num}>"}>
+                    <input type="text" name="send_num[<{$order.order_id}>]" size="8" value="<{$remain_num}>" class="send_num" order_id="<{$order.order_id}>" max="<{$remain_num}>" min="0" required />
+                </td>
+            </tr>
+            <{foreachelse}>
+            <tr><td class="no-records" colspan="7">请选择要发货订单</td></tr>
+            <{/foreach}>
+            </tbody>
+        </table>
+    </div>
+    <div style="text-align:center;">
+        <button type="submit">生成发货单</button>　
+        <button type="button" class="popup-btn-close">取消</button>
+    </div>
+</form>
+
+<script>
+
+    // 保存
+    var f = $('deliveryForm');
+    var action = f.get('action');
+    f.addEvent('submit',function(e){
+        e.stop();
+        if(!validator(this)) return false;
+
+        var submit_btn = this.getElement('[type=submit]');
+        new Request({url:action,
+            onRequest:function(e){
+                submit_btn.set('value', '发货中...');
+                submit_btn.set('disabled', true);
+            },
+            onComplete:function(re){
+                var result = JSON.decode(re);
+                if (result.rsp == 'succ')
+                {
+                    alert(result.msg);
+                    self.window.location = '<{spUrl app=desktop c=ctl_delivery a=index}>/cus_id/<{$cus_id}>/print_status/0';
+                }else{
+                    submit_btn.set('value', '发货');
+                    submit_btn.set('disabled', false);
+                    alert(result.msg);
+                    return false;
+                }
+            }
+        }).send(f.toQueryString());
+    });
+
+    $$(".send_num").addEvent('change', function(e){
+        send_num_filter(this);
+    });
+
+    function send_num_filter(e)
+    {
+        var _ca = e.getNext('.error');
+        var tr = e.getParent('tr');
+        var order_id = e.get('order_id');
+        var max = e.get('max');
+        var min = e.get('min');
+
+        if (/^\d+$/.test(e.value)){
+            if (parseInt(e.value) < min){
+                if (!_ca){
+                    new Element('span',{'class':'error caution notice-inline',html:'最小发货数量:'+min}).inject(e,'after');
+                    e.set('value', '0');
+                }
+                return;
+            }else{
+                if (_ca) _ca.remove();
+            }
+        }else{
+            if (!_ca){
+                new Element('span',{'class':"error caution notice-inline",html:"发货数输入有误"}).inject(e,'after');
+                e.set('value', '0');
+                return;
+            }
+        }
+    }
+
+</script>

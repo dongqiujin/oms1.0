@@ -1,0 +1,26 @@
+.tips
+ {
+     padding: 20px;
+     color: #333333;
+     position: absolute;
+     z-index: 2;//对应下边tipsBg中z-index: 1的部分值越大放在越上边
+ }
+ .tips input
+ {
+     width: 150px;
+     height: 20px;
+     border: 1px solid #D5D5D5;
+     margin-top: 5px;
+ }
+ .tipsBg
+ {
+     width: 194px;
+     height: 122px;
+     border: 1px solid #CCCCCC;
+     background-color: #FBFBFB;
+     filter: Alpha(opacity=95);//透明度
+    -moz-opacity: .95;
+     opacity: 0.95;
+     position: absolute;
+     z-index: 1;
+ }

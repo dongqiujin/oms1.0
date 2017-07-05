@@ -1,0 +1,116 @@
+<{include file="header.html"}>
+<h1><span class="action-span1">分类</span><span class="action-span"><a href="###" class="add">添加分类</a></span></h1>
+<div id="goods_cat" class="list-div">
+  <table>
+    <thead>
+      <tr>
+        <th>分类名称</th>
+        <th>数量</th>
+        <th>导航栏  </th>
+        <th>是否显示</th>
+        <th>排序    </th>
+        <th class="last">操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <{$cat}>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  $$('.add').addEvent('click',function(e){
+    e.stop();
+    var cid = this.get('cid');
+    var pid = this.get('pid');
+    cat_pop('add',cid,pid);
+  });
+
+  $$('.edit').addEvent('click',function(e){
+    e.stop();
+    var cid = this.get('cid');
+    var pid = this.get('pid');
+    cat_pop('edit',cid,pid);
+  });
+
+  $$('.del').addEvent('click',function(e){
+    e.stop();
+    var cid = this.get('cid');
+    if (window.confirm('确定要删除吗?'))
+    {
+      new Request({url:'<{spUrl app=desktop c=ctl_cat a=del}>/action/ask/cid/'+cid,  
+        onComplete:function(re){
+          var result = JSON.decode(re);
+          if (result.rsp == 'succ')
+          {
+            self.window.location.reload();
+            }else{
+            if (window.confirm('此分类存在子分类,确定要全部删除吗?'))
+            {
+              del(cid);
+            }
+          }
+        }
+      }).send();
+    }
+  });
+
+  $$('.set_daohang').addEvent('click',function(e){
+    e.stop();
+    var cid = this.get('cid');
+    new Request({url:'<{spUrl app=desktop c=ctl_cat a=daohang}>/action/set/cid/'+cid+'/daohang/1',  
+      onComplete:function(re){
+        var result = JSON.decode(re);
+        if (result.rsp == 'succ')
+        {
+          self.window.location.reload();
+        }
+      }
+    }).send();
+  });
+
+  $$('.cancel_daohang').addEvent('click',function(e){
+    e.stop();
+    var cid = this.get('cid');
+    new Request({url:'<{spUrl app=desktop c=ctl_cat a=daohang}>/action/cancel/cid/'+cid+'/daohang/0',  
+      onComplete:function(re){
+        var result = JSON.decode(re);
+        if (result.rsp == 'succ')
+        {
+          self.window.location.reload();
+        }
+      }
+    }).send();
+  });
+
+  function del(cid){
+    new Request({url:'<{spUrl app=desktop c=ctl_cat a=del}>/action/del/cid/'+cid,  
+      onComplete:function(re){
+        var result = JSON.decode(re);
+        if (result.rsp == 'succ')
+        {
+          self.window.location.reload();
+        }
+      }
+    }).send();
+  }
+
+  function cat_pop(type,cid,pid){
+    var url='';
+    if (type == 'add')
+    {
+      url = '<{spUrl app=desktop c=ctl_cat a=add}>';
+      type_name = '添加';
+      }else{
+      url = '<{spUrl app=desktop c=ctl_cat a=edit}>';
+      type_name = '编辑';
+    }
+    var class_id = '<{$class_id}>';
+
+    new Dialog(url+'/cid/'+cid+'/pid/'+pid+'/class/'+class_id,{title:type_name+'分类', width:300,pins:true,async:'ajax',position: {
+        offset: {x: 0, y: -100},
+        intoView: true
+    }});
+  }
+</script>
+<{include file="footer.html"}>

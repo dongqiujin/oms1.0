@@ -1,0 +1,36 @@
+<div id="ext_cat">
+<{$cat}>
+<button type="button" id="choice" class="popup-btn-close">确定</button>
+<button type="button" class="popup-btn-close">取消</button>
+</div>
+
+<script>
+window.addEvent('domready',function(){
+    $('choice').addEvent('click', function(e){
+        var ele_catId = $$('input[name^=cat_id]:checked'),cat_id = [],cat_name = [];
+        ele_catId.each(function(el,i){
+            cat_id.push(el.get('value'));
+            cat_name.push(el.get('label'));
+        });
+        $('ext_cat_id').set('value', cat_id);
+        if (!cat_name[0]){
+            cat_name = '--请选择--';
+        }
+        $('ext_cat').set('html', cat_name.join(','));
+    });
+
+    // 选中之前的
+    var cat_input = $$('input[name^=cat_id][type=checkbox]');
+    var cid = '<{$ext_cat_id}>',cids;
+    cids = cid.split(",");
+
+    if (cids.length){
+        cat_input.each(function(el){
+            if (cids.indexOf(el.get('value'))>-1){
+                el.set('checked', true);
+            }
+        });
+    }
+
+});
+</script>

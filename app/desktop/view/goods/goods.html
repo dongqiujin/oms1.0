@@ -1,0 +1,334 @@
+<{include file="header.html"}>
+<{style href="css/tab.css"}>
+<{script src="js/tab.js"}>
+<{script src="js/editor/kindeditor.js" app="base"}>
+<{script src="js/file_upload.js" app="base"}>
+
+<div><h3>添加/编辑商品</h3></div>
+<form method="post" id="uploadForm" name="uploadForm" enctype="multipart/form-data" action="<{spUrl app=desktop c=ctl_goods a=save}>" novalidate>
+  <input type="hidden" name="action" value="<{$action}>" />
+  <input type="hidden" name="goods_id" value="<{$goods_id}>" />
+  <div class="tab-pane" id="tabPane1">
+    <div class="tab-page" id="tabPage1">
+      <h2 class="tab">商品主信息</h2>
+      <table border="0" cellpadding="0" cellspacing="6" class="gridtable">
+        <tr>
+          <td width="120">商品名称: <em class="red">*</em></td>
+          <td><input type="text" name="name" value="<{$goods.name}>" required size="40" /></td>
+        </tr>
+        <tr>
+          <td>商品编号:</td>
+          <td><input type="text" name="bn" value="<{$goods.bn}>" size="30" /></td>
+        </tr>
+        <tr>
+          <td>商品分类: <em class="red">*</em></td>
+          <td>
+            <select id="cat_id" name="cat_id" required>
+              <option value="0">--请选择--</option>
+              <{$cat}>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>扩展分类:</td>
+          <td><button type="button" name="ext_cat" id="ext_cat"><{if $ext_cat_names}><{$ext_cat_names}><{else}>--请选择--<{/if}></button>
+            <input type="hidden" name="ext_cat_id" id="ext_cat_id" value="<{$ext_cat_id}>" />
+          </td>
+        </tr>
+        <tr>
+          <td>销量:</td>
+          <td><input type="text" name="sales_num" value="<{$goods.sales_num}>" /></td>
+        </tr>
+        <tr>
+          <td>销售价: <em class="red">*</em></td>
+          <td><input type="text" name="sales_price" value="<{$goods.sales_price}>" required /></td>
+        </tr>
+        <tr>
+          <td>市场价:</td>
+          <td><input type="text" name="market_price" value="<{$goods.market_price}>" /></td>
+        </tr>
+        <tr>
+          <td>库存:</td>
+          <td><input type="text" name="stock" value="<{$goods.stock}>" /></td>
+        </tr>
+        <tr>
+          <td>加入推荐:</td>
+          <td>
+            <input type="checkbox" name="is_hot" value="1" <{if $goods.is_hot == '1'}>checked="checked"<{/if}> /> 热销
+            <input type="checkbox" name="is_special" value="1" <{if $goods.is_special == '1'}>checked="checked"<{/if}> /> 特惠
+          </td>
+        </tr>
+        <tr>
+          <td>上架:</td>
+          <td><input type="checkbox" name="marketable" value="1" <{if $goods.marketable == '1'}>checked="checked"<{/if}> /> 打勾表示允许销售，否则不允许销售。</td>
+        </tr>
+        <tr>
+          <td>上传商品图片:</td>
+          <td><input type="file" name="pic" size="35" /> <span id="pic_span">
+              <a href="<{$public_dir}>/<{$goods.pic}>" target="_blank"><img src="<{$public_dir}>/<{$goods.thumb}>" width="50" height="50" /></a>
+          </span></td>
+        </tr>
+        <tr style="display:none;">
+          <td>上传商品缩略图:</td>
+          <td><input type="file" name="thumb" id="thumb" size="35" disabled="disabled" /> <span id="thumb">
+              <a href="<{$public_dir}>/<{$goods.thumb}>" target="_blank"><img src="<{$public_dir}>/<{$goods.thumb}>" /></a>
+          </span></td>
+        </tr>
+        <tr style="display:none;">
+          <td></td>
+          <td><input type="checkbox" name="auto_thumb" id="auto_thumb" value="1" checked="checked" />自动生成商品缩略图</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="tab-page" id="tabPage2">
+      <h2 class="tab">其他信息</h2>
+      <table width="99%" border="0" cellpadding="0" cellspacing="6" class="gridtable">
+        <tr>
+          <td>材料:</td>
+          <td><input type="text" name="material" value="<{$goods.goods_contents.material}>" size="80" /></td>
+        </tr>
+        <tr>
+          <td>包装:</td>
+          <td><input type="text" name="packaging" value="<{$goods.goods_contents.packaging}>" size="80" /></td>
+        </tr>
+        <tr>
+          <td>花语:</td>
+          <td><input type="text" name="flower_language" value="<{$goods.goods_contents.flower_language}>" size="80" /></td>
+        </tr>
+        <tr>
+          <td>附送:</td>
+          <td><input type="text" name="attached" value="<{$goods.goods_contents.attached}>" size="80" /></td>
+        </tr>
+        <tr>
+          <td>配送:</td>
+          <td><input type="text" name="delivery" value="<{$goods.goods_contents.delivery}>" size="80" /></td>
+        </tr>
+        <tr>
+          <td>说明:</td>
+          <td><textarea id="description" name="description" style="width:60%;height:80px;"><{$goods.goods_contents.description}></textarea></td>
+        </tr>
+      </table>
+    </div>
+    <div class="tab-page" id="tabPage3">
+      <h2 class="tab">详细描述</h2>
+      <table border="0" cellpadding="0" cellspacing="6" class="txt12">
+        <tr>
+          <td colspan="2"><textarea id="contents" name="contents" style="width:90%;height:400px;visibility:hidden;text-align:left;"><{$goods.goods_contents.contents}></textarea></td>
+        </tr>
+      </table>
+    </div>
+    <div class="tab-page" id="tabPage4">
+      <h2 class="tab">商品相册</h2>
+      <input type="hidden" name="del_img_ids" id="del_img_ids" value="" />
+      <table width="100%" border="0" cellspacing="0" cellpadding="0" class="gridtable">
+        <tr>
+          <td>
+            <{foreach from=$goods.goods_img item=goods_img}>
+            <{if $goods_img.img_id}>
+            <div id="photo_<{$goods_img.img_id}>" style="float:left;text-align:center; border: 1px solid #DADADA; margin: 4px; padding:2px;">
+              <a href="<{$public_dir}>/<{$goods_img.pic}>" target="_blank"><img src="<{$public_dir}>/<{$goods_img.thumb}>" /></a>
+              <br />
+              <span id="del_photo[<{$goods_img.img_id}>]">
+                <a href="javascript:;" class="del" img_id="<{$goods_img.img_id}>">删除</a>
+              </span>
+              <span id="restock_photo[<{$goods_img.img_id}>]" style="display:none;">
+                <a href="javascript:;" class="restock" img_id="<{$goods_img.img_id}>">恢复</a>
+              </span>
+            </div>
+            <{/if}>
+            <{/foreach}>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div>上传图片:<a href="javascript:void(0);" hidefocus="hidefocus" class="files" id="idFile"></a></div>
+            <table class="files-table" align="left"><tbody id="idFileList"><tr><td class='gray'>没有添加图片</td></tr></tbody></table>
+            <div class="clear gray" id="idTips"></div>
+            <div class="red"><{$msg}></div>
+            <div id="idMsg">&nbsp;<button type="button" id="idBtndel" disabled="disabled" class="btn_no">全部取消</button></div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div style="text-align:center;">
+    <button type="submit" id="save">保存</button>
+  </div>
+</form>
+<script>
+  (function(){
+    $('uploadForm').addEvent('submit',function(e){
+      if(!validator(this)) return false;
+      var submit_btn = this.getElement('[type=submit]');
+      var name = this.getElement('[name=name]').get('value');
+      var goods_id = this.getElement('[name=goods_id]').get('value');
+      new Request({url:'<{spUrl app=desktop c=ctl_goods a=check_goods_name}>',
+        onRequest:function(e){
+          submit_btn.set('disabled', true);
+        },
+        onComplete:function(re){
+          var result = JSON.decode(re);
+          if (result.rsp == 'fail'){
+            submit_btn.set('disabled', false);
+            Dialog.alert(result.msg);
+            return false;
+          }
+        }
+      }).send('name='+name+'&goods_id='+goods_id);
+
+      // 提交表单
+      //this.submit();
+    });
+
+
+    // 主信息-----------------------------
+    $('ext_cat').addEvent('click', function(){
+      var url = '<{spUrl app=desktop c=ctl_cat a=ext_cat}>';
+      var ext_cat_id = $('ext_cat_id').get('value');
+      new Dialog(url,{
+        title:'扩展分类', width:220,height:Math.min(400,window.getSize().y),pins:true,async:'ajax',
+        position: {
+          offset: {x: 0, y: 5},
+          intoView: true
+        },
+        asyncOptions: {
+          method: 'post',
+          data: 'ext_cat_id='+ext_cat_id
+        }
+      });
+    });
+
+    $('auto_thumb').addEvent('click', function(e){
+      if (this.get('checked') == false)
+      {
+        $('thumb').set('disabled', false);
+      }else{
+        $('thumb').set('disabled', true);
+      }
+    });
+
+
+    KE.init({
+      id : 'description',
+      afterCreate : function(id) {
+        KE.util.focus(id);
+      }
+    });
+
+    KE.show({
+      id: 'contents',
+      afterCreate : function(id) {
+        KE.event.ctrl(document, 13, function() {
+          KE.sync(id);
+          document.forms['uploadForm'].submit();
+        });
+        KE.event.ctrl(KE.g[id].iframeDoc, 13, function() {
+          KE.sync(id);
+          document.forms['uploadForm'].submit();
+        });
+      }
+    });
+
+    // 商品相册
+    var fu = new FileUpload("uploadForm", "idFile", {
+      FileName: "photo[]",
+      ExtIn: ["gif","jpg","png"],
+      Limit: 20,
+      onInit: function(){
+        //显示图片列表
+        var arrRows = [];
+        if(this.Files.length){
+          var oThis = this;
+          Each(this.Files, function(o){
+            var a = document.createElement("a");
+            a.innerHTML = "取消";
+            a.href = "javascript:void(0);";
+            a.onclick = function(){ oThis.Delete(o); return false; };
+            arrRows.push([o.value, a]);
+          });
+        }
+        else {
+          arrRows.push(['<span class="gray">没有添加图片</span>','']);
+        }
+        AddList(arrRows);
+        //设置按钮
+        $("idBtndel").disabled = this.Files.length <= 0;
+      }
+    });
+    $('idTips').innerHTML = '最多可同时上传 <b>' +fu.Limit+ '</b> 个图片，只允许上传 <b>' +fu.ExtIn.join("，")+ '</b> 图片,尺寸宽不超过688,高不超过515。';
+    $("idBtndel").onclick = function(){ fu.Clear(); };
+
+    //用来添加图片列表的函数
+    function AddList(rows){
+      //根据数组来添加列表
+      var FileList = $("idFileList"), oFragment = document.createDocumentFragment();
+      //用文档碎片保存列表
+      Each(rows, function(cells){
+        var row = document.createElement("tr");
+        Each(cells, function(o){
+          var cell = document.createElement("td");
+          if(typeof o == "string"){ cell.innerHTML = o; }
+          else{ cell.appendChild(o); }
+          row.appendChild(cell);
+        });
+        oFragment.appendChild(row);
+      });
+      //ie的table不支持innerHTML所以这样清空table
+      while(FileList.hasChildNodes()){ FileList.removeChild(FileList.firstChild); }
+      FileList.appendChild(oFragment);
+    }
+
+
+    // ------------------商品编辑
+    // 选择商品分类
+    var cat_option = $('cat_id').getElements('option');
+    var cid = '<{$goods.cat_id}>';
+    cat_option.each(function(el){
+      if (el.get('value') == cid){
+        el.set('selected', 'selected');
+      }
+    });
+
+    // 删除/恢复商品相册
+    $$('.del').addEvent('click',function(e){
+      e.stop();
+      var img_id = this.get('img_id');
+      photo_action('del',img_id);
+      this.getParent().setStyle('display','none');
+      this.getParent('span+span').setStyle('display','');
+      this.getParent().inject(this.getParent('span+span'), 'after');
+    });
+    $$('.restock').addEvent('click',function(e){
+      e.stop();
+      var img_id = this.get('img_id');
+      photo_action('restock',img_id);
+      this.getParent().setStyle('display','none');
+      this.getParent('span+span').setStyle('display','');
+      this.getParent().inject(this.getParent('span+span'), 'after');
+    });
+
+    function photo_action(type,img_id){
+      var old_photo = $('del_img_ids').get('value'),new_photo = new Array();
+      new_photo = old_photo.split(',');
+      if(type == 'del'){
+        new_photo.push(img_id);
+        }else{
+        for(i=0;i<new_photo.length;i++){
+          if (img_id == new_photo[i])
+          {
+            new_photo[i] = '';
+          }
+        }
+      }
+      for(i=0;i<new_photo.length;i++){
+        if (new_photo[i] == '')
+        {
+          new_photo.splice(i,1);
+        }
+      }
+      var ids = new_photo.join(',');
+      $('del_img_ids').set('value', ids);
+    }
+  })();
+</script>

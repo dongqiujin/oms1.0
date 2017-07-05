@@ -1,0 +1,268 @@
+<{include file="header.html"}>
+<h1>
+  <span class="action-span"><a href="<{spUrl app=desktop c=ctl_goods a=add}>">添加商品</a></span>
+  <span class="action-span1">商品列表</span>
+  <div style="clear:both"></div>
+</h1>
+
+<div class="form-div">
+  <form action="<{spUrl app=desktop c=ctl_goods a=index}>/search/do" method="post" name="searchForm">
+    <{img src="img/icon_search_g.gif" width="26" height="22" border="0" alt="SEARCH"}>
+    <!-- 分类 -->
+    <select name="cat_id" id="cat_id">
+      <option value="0">所有分类</option>
+      <{$cat}>
+    </select>
+    <!-- 推荐 -->
+    <select name="type" id="type">
+      <option value="">全部</option>
+      <option value="1" <{if $is_hot == '1'}>selected="selected"<{/if}> >热销</option>
+      <option value="2" <{if $is_hot == '0'}>selected="selected"<{/if}> >非热销</option>
+      <option value="3" <{if $is_special == '1'}>selected="selected"<{/if}> >特惠</option>
+      <option value="4" <{if $is_special == '0'}>selected="selected"<{/if}> >非特惠</option>
+      <option value="5" <{if $marketable == '1'}>selected="selected"<{/if}> >上架</option>
+      <option value="6" <{if $marketable == '0'}>selected="selected"<{/if}> >下架</option>
+    </select>
+    <!-- 关键字 -->
+    商品名称：<input type="text" name="name" size="30" value="<{$name}>" />
+    商品编号：<input type="text" name="bn" size="15"  value="<{$bn}>" />
+    <input type="submit" value="搜索" class="button" />
+  </form>
+</div>
+
+<form action="<{spUrl app=desktop c=ctl_goods a=operator}>" method="post" name="actionForm" id="actionForm">
+  <div class="list-div" id="listDiv">
+    <table cellpadding="3" cellspacing="1">
+      <thead>
+        <tr>
+          <th class="tlt" width="50">
+            <input id="selectAll" type="checkbox" />
+            <a href="javascript:;" class="sort" sort_name="goods_id" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">序号</a>
+          </th>
+          <th><a href="javascript:;" class="sort" sort_name="name" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>" >商品名称</a></th>
+          <th><a href="javascript:;" class="sort" sort_name="bn" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">商品编号</a></th>
+          <th><a href="javascript:;" class="sort" sort_name="sales_num" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">销量</a></th>
+          <th><a href="javascript:;" class="sort" sort_name="visit" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">人气</a></th>
+          <th><a href="javascript:;" class="sort" sort_name="sales_price" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">销售价</a></th>
+          <th><a href="javascript:;" class="sort" sort_name="market_price" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">市场价</a></th>
+          <th><a href="javascript:;" class="sort" sort_name="marketable" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">上架</a></th>
+          <th><a href="javascript:;" class="sort" sort_name="is_hot" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">热销</a></th>
+          <th><a href="javascript:;" class="sort" sort_name="is_special" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">特惠</a></th>
+          <th><a href="javascript:;" class="sort" sort_name="stock" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">库存</a></th>
+          <th><a href="javascript:;" class="sort" sort_name="g_order" sort_type="<{if $sort_type == 'asc'}>desc<{else}>asc<{/if}>">排序</a></th>
+          <th class="last">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <{foreach from=$goods_list key=keys item=goods}>
+        <tr>
+          <td><input type="checkbox" name="goods_id[]" value="<{$goods.goods_id}>" /> <{$goods.goods_id}></td>
+          <td class="first-cell"><span ondblclick="editab(this,'<{$goods.goods_id}>','name');" title="双击编辑"><{$goods.name|escape:html}></span></td>
+          <td align="center"><span ondblclick="editab(this,'<{$goods.goods_id}>','bn');" title="双击编辑"><{$goods.bn}></span></td>
+          <td align="center"><span ondblclick="editab(this,'<{$goods.goods_id}>','sales_num');" title="双击编辑"><{$goods.sales_num}></span></td>
+          <td align="center"><span ondblclick="editab(this,'<{$goods.goods_id}>','visit');" title="双击编辑"><{$goods.visit}></span></td>
+          <td align="right"><span ondblclick="editab(this,'<{$goods.goods_id}>','market_price');" title="双击编辑"><{$goods.market_price}></span></td>
+          <td align="right"><span ondblclick="editab(this,'<{$goods.goods_id}>','sales_price');" title="双击编辑"><{$goods.sales_price}></span></td>
+
+          <td align="center">
+            <a href="javascript:;"><img src="<{$base_url}>/app/desktop/statics/img/<{if $goods.marketable}>yes<{else}>no<{/if}>.gif" alt="<{$goods.marketable}>" onclick="toggle(this, <{$goods.goods_id}>, 'marketable');"></a>
+          </td>
+          <td align="center">
+            <a href="javascript:;"><img src="<{$base_url}>/app/desktop/statics/img/<{if $goods.is_hot}>yes<{else}>no<{/if}>.gif" alt="<{$goods.is_hot}>" onclick="toggle(this, <{$goods.goods_id}>, 'is_hot');"></a>
+          </td>
+          <td align="center">
+            <a href="javascript:;"><img src="<{$base_url}>/app/desktop/statics/img/<{if $goods.is_special}>yes<{else}>no<{/if}>.gif" alt="<{$goods.is_special}>" onclick="toggle(this, <{$goods.goods_id}>, 'is_special');"></a>
+          </td>
+
+          <td align="center"><span ondblclick="editab(this,'<{$goods.goods_id}>','stock');" title="双击编辑"><{$goods.stock}></span></td>
+          <td align="center"><span ondblclick="editab(this,'<{$goods.goods_id}>','g_order');" title="双击编辑"><{$goods.g_order}></span></td>
+
+          <td align="center" class="last"><a title="查看" target="_blank" href="<{spUrl app=b2c c=ctl_goods a=view id=$goods.goods_id}>"><{img width="16" border="0" height="16" src="img/icon_view.gif"}></a>
+            <a title="编辑" href="<{spUrl app=desktop c=ctl_goods a=edit goods_id=$goods.goods_id}>"><{img width="16" border="0" height="16" src="img/icon_edit.gif"}></a>
+            <a title="回收站" class="recycle" goods_id="<{$goods.goods_id}>" href="javascript:;"><{img width="16" border="0" height="16" src="img/icon_trash.gif"}></a></td>
+        </tr>
+        <{foreachelse}>
+        <tr><td class="no-records" colspan="11">暂无商品</td></tr>
+        <{/foreach}>
+      </tbody>
+    </table>
+    <!-- end goods list -->
+
+    <!-- 分页 -->
+    <table id="page-table" cellspacing="0">
+      <tr>
+        <td align="right" nowrap="true">
+          <div id="turn-page">
+            <{pager pager=$pager myclass="yahoo2" c="ctl_goods" a="index" offset="5"}>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <div>
+      <input type="hidden" name="act" value="batch" />
+      <select name="action" id="operator">
+        <option value="">请选择...</option>
+        <option value="1">删除</option>
+        <option value="2">上架</option>
+        <option value="3">下架</option>
+        <option value="4">热销</option>
+        <option value="5">取消热销</option>
+        <option value="6">特惠</option>
+        <option value="7">取消特惠</option>
+        <option value="8">转移到分类</option>
+      </select>
+      <select name="target_cat" id="target_cat" style="display:none">
+        <{$cat}>
+      </select>
+      <input type="button" value="确定" id="btn_operator" name="btn_operator" class="button" disabled="disabled" />
+    </div>
+  </div>
+</form>
+
+<script>
+    // 字段编辑
+    function editab(obj,goods_id,field){
+        // 原始内容
+        var old_value = $(obj).get('text');
+        // 隐藏原值
+        // 创建输入框
+        var input = new Element('input', {'type':'text', 'name':field, 'value':old_value, styles:{width:Math.max($(obj).getSize().x+1,20)}});
+        input.inject($(obj).empty());
+        input.focus();
+        input.addEvents({
+            'blur': function(e){
+                var new_value = this.get('value');
+                if (old_value == new_value) {
+                    $(obj).empty();
+                    $(obj).set('text', new_value);
+                }else{
+                    new Request({url:'<{spUrl app=desktop c=ctl_goods a=editab}>',
+                        onComplete:function(re){
+                          var result = JSON.decode(re);
+                          if (result.rsp == 'succ') {
+                             $(obj).empty();
+                             $(obj).set('text', new_value);
+                          }
+                          else{
+                            Dialog.alert(result.msg);
+                            input.focus();
+                            return false;
+                          }
+                        }
+                    }).send('goods_id='+goods_id+'&'+field+'='+new_value+'&field_name='+field);
+                }
+            }
+        });
+    }
+
+    // 状态切换
+    function toggle(obj,goods_id,field){
+        // 原始状态
+        var old_status = $(obj).get('src');
+        var old_value = $(obj).get('alt');
+        var new_value = '';
+        if (old_value == '0')
+        {
+            var new_src = '<{$base_url}>/app/desktop/statics/img/yes.gif';
+            var new_value = '1';
+        }else{
+            var new_src = '<{$base_url}>/app/desktop/statics/img/no.gif';
+            var new_value = '0';
+        }
+
+        new Request({url:'<{spUrl app=desktop c=ctl_goods a=editab}>',
+            onComplete:function(re){
+              var result = JSON.decode(re);
+              if (result.rsp == 'succ') {
+                 $(obj).set('src', new_src);
+                 $(obj).set('alt', new_value);
+              }
+              else{
+                alert(result.msg);
+                return false;
+              }
+            }
+          }).send('goods_id='+goods_id+'&'+field+'='+new_value+'&field_name='+field);
+    }
+
+  selectAll('selectAll', 'input[name="goods_id[]"]');
+  // 操作
+  $('operator').addEvent('change', function(e){
+
+    // 显示分类
+    if (this.get('value') == '8'){
+      $('target_cat').setStyle('display', '');
+    }
+    else{
+      $('target_cat').setStyle('display', 'none');
+    }
+
+    if (this.get('value')) {
+      $('btn_operator').set('disabled', '');
+    }else{
+      $('btn_operator').set('disabled', 'disabled');
+    }
+  });
+
+  // 确定操作
+  var actionForm = $('actionForm');
+  $('btn_operator').addEvent('click', function(e){
+    var operator = $('operator').get('value');
+    if (operator == '1' && window.confirm('确定要删除吗?删除后不可恢复')){
+      actionForm.submit();
+    }
+
+    if (operator == '8' && window.confirm('确定要转移分类吗?')){
+      actionForm.submit();
+    }
+
+    if (operator != '1' && operator != '8') {
+      actionForm.submit();
+    }
+  });
+
+  $$('.recycle').addEvent('click',function(e){
+    e.stop();
+    var goods_id = this.get('goods_id');
+    if (window.confirm('确定要删除吗?删除后不可恢复')){
+      new Request({url:'<{spUrl app=desktop c=ctl_goods a=del}>/goods_id/'+goods_id,
+        onComplete:function(re){
+          var result = JSON.decode(re);
+          if (result.rsp == 'succ') {
+            Dialog.alert('删除成功');
+            self.window.location.reload();
+          }
+          else{
+            Dialog.alert(result.res);
+            return false;
+          }
+        }
+      }).send();
+    }
+    return false;
+  });
+
+  // 排序
+  $$('.sort').addEvent('click',function(e){
+    var url = '<{spUrl app=desktop c=ctl_goods a=index}>';
+    self.window.location = url + '/sort_name/' + this.get('sort_name') + '/sort_type/' + this.get('sort_type');
+  });
+
+  // 搜索
+  var cat_option = $('cat_id').getElements('option');
+  var cid = '<{$cat_id}>';
+  cat_option.each(function(el){
+    if (el.get('value') == cid){
+      el.set('selected', true);
+    }
+  });
+
+  var type_option = $('type').getElements('option');
+  var type = '<{$type}>';
+  type_option.each(function(el){
+    if (el.get('value') == type){
+      el.set('selected', true);
+    }
+  });
+</script>

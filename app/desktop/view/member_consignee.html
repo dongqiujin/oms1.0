@@ -1,0 +1,170 @@
+<div id="member_consignee">
+  <form method="post" name="consigneeForm" id="consigneeForm" action="<{spUrl app=desktop c=ctl_member a=save_consignee}>">
+    <input type="hidden" name="member_id" value="<{$member.member_id}>" />
+    <table>
+      <tr>
+        <td>会员名:</td>
+        <td><{$member.name}></td>
+      </tr>
+      <tr>
+        <td>收货人姓名:</td>
+        <td><input type="text" name="consignee_name" value="<{$member.detail.consignee_name}>" size="16" /></td>
+      </tr>
+      <tr>
+        <td>收货人地区:</td>
+        <td>
+		<select id="province" name="province">
+			<option value="">请选择</option>
+			<{foreach from=$provice_list item=province}>
+				<option value="<{$province.region_id}>"><{$province.region_name}></option>
+			<{/foreach}>
+		</select>
+		<select id="city" name="city" style="display:none;"></select>
+		<select id="district" name="district" style="display:none;"></select>
+		</td>
+      </tr>
+      <tr>
+        <td>收货人地址:</td>
+        <td><input type="text" name="consignee_address" value="<{$member.detail.consignee_address}>" size="40" /></td>
+      </tr>
+      <tr>
+        <td>收货人邮编:</td>
+        <td><input type="text" name="consignee_postcode" value="<{$member.detail.consignee_postcode}>" size="6" /></td>
+      </tr>
+      <tr>
+        <td>收货人固定电话:</td>
+        <td><input type="text" name="consignee_phone" value="<{$member.detail.consignee_phone}>" size="15" /></td>
+      </tr>
+      <tr>
+        <td>收货人手机:</td>
+        <td><input type="text" name="consignee_mobile" value="<{$member.detail.consignee_mobile}>" size="15" /></td>
+      </tr>
+    </table>
+    <button type="button" id="save">修改</button>
+    <button type="button" class="popup-btn-close">关闭</button>
+  </div>
+</form>
+
+<script>
+  window.addEvent('domready',function(){
+    var f = $('consigneeForm');
+    var action = f.get('action');
+    // 修改
+    $('save').addEvent('click', function(e){
+      new Request({url:action,
+        onRequest:function(e){
+          $('save').set('disabled', true);
+        },
+        onComplete:function(re){
+          var result = JSON.decode(re);
+          if (result.rsp == 'succ')
+          {
+            alert('修改成功');
+            close();
+            }else{
+            $('save').set('disabled', false);
+            alert(result.msg);
+            return false;
+          }
+        }
+      }).send(f);
+    });
+
+    // 关闭
+    $$('.popup-btn-close').addEvent('click', function(e){
+      close();
+    }); 
+
+    function close(){
+      $('save').getParent('.popup-container').retrieve('instance').hide();
+    }
+
+	// 选中省
+    var province = $('province').getElements('option');
+    var province_id = '<{$province_id}>';
+    province.each(function(el){
+      if (el.get('value') == province_id){
+        el.set('selected', 'selected');
+		choice_province($('province'));
+      }
+    });
+	var city_id = '<{$city_id}>';
+	var district_id = '<{$district_id}>';
+
+	// 获取市级数据
+	$('province').addEvent('change', function(e){
+		choice_province(this);
+	});
+
+	function choice_province(el){
+		var parent_id = el.get('value');
+		$('city').empty();
+		$('district').empty();
+		$('city').setStyle('display', 'none');
+		$('district').setStyle('display', 'none');
+		if (parent_id)
+		{
+			new Request({url:'<{spUrl app=desktop c=ctl_member a=get_region}>/parent_id/'+parent_id,
+				onComplete:function(re){
+				  var citys = JSON.decode(re);
+				  if (citys)
+				  {
+					  $('city').setStyle('display', '');
+					  var option = new Element('option', {'value':'','text':'请选择'});
+					  option.inject($('city'));
+					  citys.each(function(item,index){
+						  if (item.region_id == city_id)
+						  {
+							option = new Element('option', {'value':item.region_id,'text':item.region_name,'selected':'selected'});
+						  }else{
+							option = new Element('option', {'value':item.region_id,'text':item.region_name});
+						  }						  
+						  option.inject($('city'));
+					  });
+					  choice_city($('city'));
+				  }else{
+					 $('city').setStyle('display', 'none');
+				  }				  
+				}
+			}).send();
+		}
+	}
+
+	// 获取县区级数据
+	$('city').addEvent('change', function(e){
+		choice_city(this);
+	});
+
+	function choice_city(el){
+		var parent_id = el.get('value');
+		$('district').empty();
+		$('district').setStyle('display', 'none');
+		if (parent_id)
+		{
+			new Request({url:'<{spUrl app=desktop c=ctl_member a=get_region}>/parent_id/'+parent_id,
+				onComplete:function(re){
+				  var districts = JSON.decode(re);
+				  if (districts)
+				  {
+				      $('district').setStyle('display', '');
+					  var option = new Element('option', {'value':'','text':'请选择'});
+				      option.inject($('district'));
+					  districts.each(function(item,index){
+					      if (item.region_id == district_id)
+					      {
+							option = new Element('option', {'value':item.region_id,'text':item.region_name,'selected':'selected'});
+					      }else{
+							option = new Element('option', {'value':item.region_id,'text':item.region_name});
+						  }						  
+						  option.inject($('district'));
+					  });
+				  }else{
+					 $('district').setStyle('display', 'none');
+				  }				  
+				}
+			}).send();
+		}
+	}
+
+});
+</script>

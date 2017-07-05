@@ -1,0 +1,10 @@
+<{include file="header.html"}>
+<div class="form-div" style="text-align:center;">
+<h2 class="title">提示信息</h2>
+
+<{if $status == 'succ'}><{else}><p style="color:red;">失败</p><{/if}>
+	  <{$msg}>
+	  <p>
+		<button type="button" class="bt" onclick="javascript:<{$url}>;">返回</button>
+	  </p>
+</div>

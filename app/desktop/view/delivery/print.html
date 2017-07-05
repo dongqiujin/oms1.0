@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--<meta name=vs_targetSchema content="http://schemas.microsoft.com/intellisense/ie5">-->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>打印发货单</title>
+    <{script src="js/jquery-1.4.2.min.js"}>
+    <{script src="js/jquery.floatDiv.js"}>
+    <{script src="js/LodopFuncs.js"}>
+    <style media=print>
+        .Noprint{display:none;}
+        .PageNext{page-break-after: always;}
+    </style>
+    <style>
+        .NOPRINT {
+            font-family: "宋体";
+            font-size: 12pt;
+        }
+        li {list-style-type:none; line-height: 20px;}
+    </style>
+</head>
+<body style="background-color: gray;">
+
+<div class="Noprint" id="printControl" style="width:400px; margin-left:auto; margin-right:auto; margin-bottom:30px;">
+        <OBJECT  id=WebBrowser  classid=CLSID:8856F961-340A-11D0-A96B-00C04FD705A2  height=0  width=0>
+        </OBJECT>
+        <input  type="button"  value="打印" id="print" onclick="upStatus();">
+        <input  type="button"  value="打印预览" onclick="prn2_preview();">
+</div>
+
+<{foreach from=$printData key=keys item=order name=print}>
+
+
+
+<div class="tabp pageTable" style="width:21cm; height:12.5cm; font-size:14px; background-color: white; margin-left:auto;padding-left:-30px; padding-top:10px; margin-right:auto;" id="listDiv">
+    <div style="text-align: center; font-size: 25px; line-height: 30px; ">海宁市飞天包装有限公司</div>
+    <div style="text-align: center;  line-height: 10px;">联系人：<input type="text" style="border:0px;font-size:14px;padding-top:-5px;width:70px;line-height: 20px;" value="胡先生" /> &nbsp;&nbsp;&nbsp;  手机:<input type="text" style="border:0px;font-size:14px;padding-top:-5px;width:110px;line-height: 20px;" value="15968357090" />  &nbsp;&nbsp;&nbsp; 传真：<input type="text" style="border:0px;font-size:14px;padding-top:-5px;width:130px;line-height: 20px;" value="0573-" /></div>
+    <div style="text-align: center; font-size:20px;font-weight:bold; margin-top:5px;">发 货 单</div>
+
+	<div>
+	<table cellpadding="3" cellspacing="1" style="width:85%; border-collapse:collapse;border:none; margin-top:-25px;margin-left:30px;">
+		<tbody>
+            <tr style="height:12px;">
+				<td width="62%">发货单号：<{$order.delivery_bn}></td>
+				<td>客户代号：<{$order.customer.cus_bn}></td>
+		    </tr>
+			<tr>
+				<td>日期：<input type="text" style="border:0px;font-size:14px;padding-top:-5px;width:100px;line-height: 20px;" value="<{$smarty.now|date_format:'%Y-%m-%d'}>" /></td>
+				<td>联系人：<{$order.customer.cus_contacts}>   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;手机：<{$order.customer.cus_mobile}></td>
+			</tr>
+			<tr>
+				<td>致：<{$order.customer.cus_company}></td>
+				<td>地点：<{$order.customer.cus_address}></td>
+			</tr>
+		</tbody>
+	</table>
+	</div>
+
+    <div style="margin-left:10px; width:20cm;margin-right:auto; padding-top:5px;margin-top:-5px;">
+        <table cellpadding="3" cellspacing="0" style="width:98%; border-collapse:collapse;border:1px solid black; border-left:none; border-right:none;border-bottom:none;">
+            <tr style="border-bottom:1px solid black;">
+                <th width="8%" style="border-bottom:1px solid black;">订单号</th>
+                <th width="15%" style="border-bottom:1px solid black;">产品名称</th>
+                <th width="8%"  style="border-bottom:1px solid black;">尺寸</th>
+                <th width="8%"  style="border-bottom:1px solid black;">颜色</th>
+                <th width="10%"  style="border-bottom:1px solid black;">原订数</th>
+                <th width="10%"  style="border-bottom:1px solid black;">送货数</th>
+                <th width="10%"  style="border-bottom:1px solid black;">单价</th>
+                <th width="10%"  style="border-bottom:1px solid black;">金额</th>
+                <th width="29%"  style="border-bottom:1px solid black;">备  注</th>
+            </tr>
+            <tbody>
+            <{foreach from=$order.items key=key item=product}>
+            <tr style="text-align: center;">
+                <td class="first-cell"  height="10px;"><{$product.order_bn}></td>
+                <td class="center" ><{$product.name}></td>
+                <td class="center" ><{$product.size}></td>
+                <td class="center" ><{$product.color}></td>
+                <td class="center" ><{$product.num}></td>
+                <td class="center" ><{$product.send_num}></td>
+                <td class="center" ><{number_format($product.price,3)}></td>
+                <td class="center" ><{if $product.num == $product.send_num}><{number_format($product.amount,3)}><{else}><{number_format(round($product.price * $product.send_num,3),3)}><{/if}></td>
+                <td align="center" ><{$product.memo}></td>
+            </tr>
+            <{/foreach}>
+
+            <tr style="text-align: center;">
+                <td colspan="9" style="padding-left: 250px;border-top:1px solid black;">总数量：<{$order.total_nums}>，总金额：<{$order.total_money}></td>
+            </tr>
+
+            <tr height="<{$order.line_top}>px">
+                <td colspan="7">
+                </td>
+            </tr>
+
+            <tr style="text-align: left;">
+                <td colspan="9">
+                    <table cellpadding="3" cellspacing="0" style="border-collapse:collapse; width:100%;margin-top:-8px;">
+                        <tr height="35">
+                            <td style="width:35%; border-top:1px solid black;">客户意见：满意<input type="checkbox" /> 一般<input type="checkbox" />
+                                差<input type="checkbox" /> 很差<input type="checkbox" /></td>
+                            <td style="width:10%; border-top:1px solid black;">打单：</td>
+                            <td style="width:36%; border-top:1px solid black;">兹收到上列货品！ 收货人签字：</td>
+                        </tr>
+                        <tr style="padding-top:0px; border-bottom:none;font-size:12px;padding-right:20px;">
+                            <td colspan="3">备注：1、货物送到后请验收，否则造成损失由客户自行负责。2、本单据既为双方购销合同，又为双方债权债务凭证，客户签字或盖章后生效。若有合同双方发生纠纷，由供货方司法机关裁决。</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<{if !$smarty.foreach.print.last}>
+<div class="NOPRINT" style="height:5px;" ></div>
+<!--分页-->
+<div class="PageNext"></div>
+<{/if}>
+
+<{/foreach}>
+
+</body>
+</html>
+
+<script type="text/javascript">
+
+	$offheight=0;     //模板偏移量 宽
+    $offwidth=0;    //模板偏移量 高               //table高
+
+	var strHtmInstall="<br><font color='#FF00FF'>打印控件未安装!点击这里<a href='http://localhost/app/desktop/statics/js/install_lodop64.exe' target='_self'>执行安装</a>,安装后请刷新页面或重新进入。</font>";
+	var strHtmUpdate="<br><font color='#FF00FF'>打印控件需要升级!点击这里<a href='http://localhost/app/desktop/statics/js/install_lodop64.exe' target='_self'>执行升级</a>,升级后请重新进入。</font>";
+	var strHtm64_Install="<br><font color='#FF00FF'>打印控件未安装!点击这里<a href='http://localhost/app/desktop/statics/js/install_lodop64.exe' target='_self'>执行安装</a>,安装后请刷新页面或重新进入。</font>";
+	var strHtm64_Update="<br><font color='#FF00FF'>打印控件需要升级!点击这里<a href='http://localhost/app/desktop/statics/js/install_lodop64.exe' target='_self'>执行升级</a>,升级后请重新进入。</font>";
+	var strHtmFireFox="<br><br><font color='#FF00FF'>（注意：如曾安装过Lodop旧版附件npActiveXPLugin,请在【工具】->【附加组件】->【扩展】中先卸它）</font>";
+	var strHtmChrome="<br><br><font color='#FF00FF'>(如果此前正常，仅因浏览器升级或重安装而出问题，需重新执行以上安装）</font>";
+
+	$(function() {
+		CheckIsInstall();
+	});
+
+
+	function upStatus()
+	{
+        LODOP=getLodop();
+        LODOP.PRINT_INIT("发货单打印");            //打印初始化
+        LODOP.PRINT_INITA("0mm","0mm","100%","100%","");
+        CreateAllPages();
+        LODOP.PRINTA();              //弹出选择打印机
+	}
+
+	function prn2_preview() {	
+			CreateAllPages();	
+			LODOP.PREVIEW();	
+	}
+
+    function CreateAllPages(){
+        LODOP=getLodop();
+        var pageObj=$('.pageTable');
+        var i;
+        for (i = 0; i < pageObj.length; i++) {
+            LODOP.NewPage();                                   //强制分页
+            LODOP.SET_PRINT_PAGESIZE(1,"210mm","140mm","发货单");           //设定打印方向和打印纸张大小
+      //      LODOP.SET_PRINT_STYLE(0,"Horient",2);         //水平居中
+      //      LODOP.SET_PRINT_STYLEA(0,"Vorient",2);
+      //      LODOP.SET_PRINT_MODE("POS_BASEON_PAPER",true);                      //设置默认基点（物理边缘）
+            LODOP.SET_LICENSES("威海和信信息技术有限责任公司","5ED2BBBD6615C31A13D3473032DB8A38","","");
+            LODOP.ADD_PRINT_HTM(0,0,"100%","100%",pageObj[i].innerHTML);
+        }
+    }
+    function CheckIsInstall() {
+        try{
+            var LODOP=getLodop();
+            if ((LODOP!=null)&&(typeof(LODOP.VERSION)!="undefined")){
+                return true;
+            }else{
+                document.getElementById('printPaper').style.display='none';
+                return false;
+            }
+            return true;
+            // alert("本机已成功安装过Lodop控件!\n  版本号:"+LODOP.VERSION);
+        }catch(err){
+            //alert("Error:本机未安装或需要升级!");
+        }
+    }
+
+
+    $("#printControl").floatdiv("righttop");
+
+    //打印
+    $('#print').click(function(e){
+        $.get("<{spUrl app=desktop c=ctl_delivery a=doPrint}>", { delivery_id: "<{$deliveryIds}>"} );
+    });
+</script>
